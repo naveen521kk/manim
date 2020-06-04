@@ -8,12 +8,15 @@ from . import constants
 from . import dirs
 from .logger import logger
 
+__all__ = ["parse_cli", "get_configuration", "initialize_directories"]
+
+
 def parse_cli():
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "file",
-            help="path to file holding the python code for the scene",
+            help="Path to file holding the python code for the scene",
         )
         parser.add_argument(
             "scene_names",
@@ -36,7 +39,7 @@ def parse_cli():
             help="Save the last frame",
         )
         parser.add_argument(
-            "--dry_run", 
+            "--dry_run",
             action="store_true",
             help= "Do a dry run (render scenes but generate no output files)",
         )
@@ -93,14 +96,14 @@ def parse_cli():
         parser.add_argument(
             "-o", "--file_name",
             help="Specify the name of the output file, if"
-                 "it should be different from the scene class name",
+                 " it should be different from the scene class name",
         )
         parser.add_argument(
             "-n", "--start_at_animation_number",
             help="Start rendering not from the first animation, but"
-                 "from another, specified by its index.  If you pass"
-                 "in two comma separated values, e.g. \"3,6\", it will end"
-                 "the rendering at the second value",
+                 " from another, specified by its index.  If you pass"
+                 " in two comma separated values, e.g. \"3,6\", it will end"
+                 " the rendering at the second value",
         )
         parser.add_argument(
             "-r", "--resolution",
@@ -122,20 +125,20 @@ def parse_cli():
         )
         parser.add_argument(
             "--media_dir",
-            help="directory to write media",
+            help="Directory to write media",
         )
         video_group = parser.add_mutually_exclusive_group()
         video_group.add_argument(
             "--video_dir",
-            help="directory to write file tree for video",
+            help="Directory to write file tree for video",
         )
         parser.add_argument(
             "--tex_dir",
-            help="directory to write tex",
+            help="Directory to write tex",
         )
         parser.add_argument(
             "--text_dir",
-            help="directory to write text",
+            help="Directory to write text",
         )
         return parser.parse_args()
     except argparse.ArgumentError as err:
@@ -269,7 +272,7 @@ def initialize_directories(config):
 
     if not config["video_dir"] or dirs.VIDEO_DIR:
         dir_config["video_dir"] = os.path.join(dir_config["media_dir"], "videos")
-        
+
     for folder in [dir_config["video_dir"], dir_config["tex_dir"], dir_config["text_dir"]]:
         if folder != "" and not os.path.exists(folder):
             os.makedirs(folder)
