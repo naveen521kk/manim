@@ -1,4 +1,4 @@
-![logo](logo/cropped.png)
+![logo](https://raw.githubusercontent.com/ManimCommunity/manim/master/logo/cropped.png)
 
 [![Build Status](https://travis-ci.com/ManimCommunity/manim.svg?branch=master)](https://travis-ci.com/ManimCommunity/manim)
 [![Documentation](https://img.shields.io/badge/docs-EulerTour-blue.svg)](https://www.eulertour.com/docs)
@@ -52,7 +52,7 @@ Before installing `manim-community`, there are some additional dependencies that
 1. Visit the [Download Page](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycairo)
 2. Select the download that corresponds to your PC's architechture and Python Version
 
-<img style="width: 20vw;" src="./readme-assets/windows_cairo.png" />
+<img style="width: 20vw;" src="https://raw.githubusercontent.com/ManimCommunity/manim/master/readme-assets/windows_cairo.png" />
 <br><br>
 
 > cp38 corresponds to Python 3.8, cp37 corresponds to Python 3.7, etc
@@ -80,7 +80,7 @@ Before installing `manim-community`, there are some additional dependencies that
 1. Go to the SoX [SourceForge](https://sourceforge.net/projects/sox/files/sox/) page
 2. Select the newest version, and download the `.exe` file
 
-<img style="width: 20vw;" src="./readme-assets/windows_sox.png" />
+<img style="width: 20vw;" src="https://raw.githubusercontent.com/ManimCommunity/manim/master/readme-assets/windows_sox.png" />
 <br><br>
 
 3. Add SoX to your PATH
@@ -93,7 +93,7 @@ Before installing `manim-community`, there are some additional dependencies that
 1. Download the MiKTex installer from its [Download Page](https://miktex.org/download)
 2. You can check you did it right by running `refreshenv` to update your environment variable and running `latex`
 
-<img style="width: 20vw;" src="./readme-assets/windows_miktex.png" />
+<img style="width: 20vw;" src="https://raw.githubusercontent.com/ManimCommunity/manim/master/readme-assets/windows_miktex.png" />
 <br><br>
 
 ### Linux
@@ -234,7 +234,7 @@ pip install -e .
 manim example_scenes/basic.py SquareToCircle -pl
 ```
 
-![](./readme-assets/command.png)
+![manim-illustration](https://raw.githubusercontent.com/ManimCommunity/manim/master/readme-assets/command.png)
 
 The `-p` flag in the command above is for previewing, meaning the video file will automatically open when it is done rendering. The `-l` flag is for a faster rendering at a lower quality.
 
@@ -244,6 +244,21 @@ Some other useful flags include:
 * `-f` to show the file in finder (for OSX).
 
 You can also set `MEDIA_DIR` environment variable to specify where the image and animation files will be written.
+
+## How is different from 3b1b version?
+
+### In a broad overview:
+- We have added the ability to export in 4K.
+- We have removed files for 3b1b's personal projects
+- We have done a general cleanup of the repository.
+- We have added minimal documentation for certain scenes, cameras and objects. (WIP)
+- We have re-added the ability to save all frames as PNGs
+- We have added detailed, coloured terminal output.
+- We have added some useful animations like "AddTextLetterByLetter"
+- We have removed broken objects and scenes, and removed unnecessary imports.
+- We have re-added the ability to export the animation as GIFS.
+- We have added a lot of LaTeX related features, like allowing you to change the template easily.
+- We have added detailed installation instructions, and contributing guidelines too.
 
 ## Documentation
 Documentation is in progress at [eulertour.com/docs](https://www.eulertour.com/docs/).
