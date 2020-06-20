@@ -1,0 +1,984 @@
+{
+  "language": "english",
+  "target": "\"D:\\Manim COmmunity\\manim\\Scripts\\python.exe\" -u \"D:\\Manim Community\\manim\\gui\\manim\\manim\\gui\\__main__.py\"",
+  "suppress_gooey_flag": false,
+  "program_name": "Widget Demo",
+  "program_description": "",
+  "sidebar_title": "Actions",
+  "default_size": [
+    610,
+    530
+  ],
+  "auto_start": false,
+  "show_advanced": true,
+  "run_validators": true,
+  "encoding": "utf-8",
+  "show_stop_warning": true,
+  "show_success_modal": true,
+  "show_failure_modal": true,
+  "force_stop_is_error": true,
+  "poll_external_updates": false,
+  "return_to_config": false,
+  "show_restart_button": true,
+  "requires_shell": true,
+  "menu": [],
+  "clear_before_run": false,
+  "use_legacy_titles": true,
+  "num_required_cols": 2,
+  "num_optional_cols": 2,
+  "manual_start": false,
+  "monospace_display": false,
+  "image_dir": "::gooey/default",
+  "language_dir": "D:\\Manim COmmunity\\manim\\lib\\site-packages\\gooey\\languages",
+  "progress_regex": null,
+  "progress_expr": null,
+  "hide_progress_msg": false,
+  "disable_progress_bar_animation": false,
+  "disable_stop_button": false,
+  "navigation": "SIDEBAR",
+  "show_sidebar": false,
+  "tabbed_groups": false,
+  "group_by_type": true,
+  "body_bg_color": "#f0f0f0",
+  "header_bg_color": "#ffffff",
+  "header_height": 80,
+  "header_show_title": true,
+  "header_show_subtitle": true,
+  "header_image_center": false,
+  "footer_bg_color": "#f0f0f0",
+  "sidebar_bg_color": "#f2f2f2",
+  "terminal_panel_color": "#F0F0F0",
+  "terminal_font_color": "#000000",
+  "terminal_font_family": null,
+  "terminal_font_weight": null,
+  "terminal_font_size": null,
+  "richtext_controls": false,
+  "error_color": "#ea7878",
+  "layout": "standard",
+  "widgets": {
+    "__main__.py": {
+      "command": "::gooey/default",
+      "name": "__main__.py",
+      "help": null,
+      "description": "",
+      "contents": [
+        {
+          "name": "required_args_msg",
+          "items": [
+            {
+              "id": "file",
+              "type": "TextField",
+              "cli_type": "positional",
+              "required": true,
+              "data": {
+                "display_name": "file",
+                "help": "Path to file holding the python code for the scene",
+                "required": true,
+                "nargs": "",
+                "commands": [],
+                "choices": [],
+                "default": null,
+                "dest": "file"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "user_input and not user_input.isspace()",
+                  "message": "This field is required"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "scene_names",
+              "type": "TextField",
+              "cli_type": "positional",
+              "required": true,
+              "data": {
+                "display_name": "scene_names",
+                "help": "Name of the Scene class you want to see",
+                "required": true,
+                "nargs": "*",
+                "commands": [],
+                "choices": [],
+                "default": null,
+                "dest": "scene_names"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "user_input and not user_input.isspace()",
+                  "message": "This field is required"
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            }
+          ],
+          "groups": [],
+          "description": null,
+          "options": {
+            "label_color": "#000000",
+            "description_color": "#363636",
+            "legacy": {
+              "required_cols": 2,
+              "optional_cols": 2
+            },
+            "columns": 2,
+            "padding": 10,
+            "show_border": false
+          }
+        },
+        {
+          "name": "optional_args_msg",
+          "items": [
+            {
+              "id": "-p",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "preview",
+                "help": "Automatically open the saved file once its done",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-p",
+                  "--preview"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "preview"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-w",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "write_to_movie",
+                "help": "Render the scene as a movie file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-w",
+                  "--write_to_movie"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "write_to_movie"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-s",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "save_last_frame",
+                "help": "Save the last frame",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-s",
+                  "--save_last_frame"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "save_last_frame"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--dry_run",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "dry_run",
+                "help": "Do a dry run (render scenes but generate no output files)",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--dry_run"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "dry_run"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-l",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "low_quality",
+                "help": "Render at low quality (for fastest rendering)",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-l",
+                  "--low_quality"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "low_quality"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-m",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "medium_quality",
+                "help": "Render at medium quality (for much faster rendering)",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-m",
+                  "--medium_quality"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "medium_quality"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-e",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "high_quality",
+                "help": "Render at high quality (for slightly faster rendering)",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-e",
+                  "--high_quality"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "high_quality"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-k",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "four_k",
+                "help": "Render at 4K quality (slower rendering)",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-k",
+                  "--four_k"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "four_k"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-g",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "save_pngs",
+                "help": "Save each frame as a png",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-g",
+                  "--save_pngs"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "save_pngs"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-i",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "save_as_gif",
+                "help": "Save the video as gif",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-i",
+                  "--save_as_gif"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "save_as_gif"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-f",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "show_file_in_finder",
+                "help": "Show the output file in finder",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-f",
+                  "--show_file_in_finder"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "show_file_in_finder"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-t",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "transparent",
+                "help": "Render to a movie file with an alpha channel",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-t",
+                  "--transparent"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "transparent"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-q",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "quiet",
+                "help": "",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-q",
+                  "--quiet"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "quiet"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-a",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "write_all",
+                "help": "Write all the scenes from a file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-a",
+                  "--write_all"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "write_all"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-o",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "file_name",
+                "help": "Specify the name of the output file, if it should be different from the scene class name",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-o",
+                  "--file_name"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "file_name"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-n",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "start_at_animation_number",
+                "help": "Start rendering not from the first animation, but from another, specified by its index.  If you pass in two comma separated values, e.g. \"3,6\", it will end the rendering at the second value",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-n",
+                  "--start_at_animation_number"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "start_at_animation_number"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-r",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "resolution",
+                "help": "Resolution, passed as \"height,width\"",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-r",
+                  "--resolution"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "resolution"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "-c",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "color",
+                "help": "Background color",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "-c",
+                  "--color"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "color"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--sound",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "sound",
+                "help": "Play a success/failure sound",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--sound"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "sound"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--leave_progress_bars",
+              "type": "CheckBox",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "leave_progress_bars",
+                "help": "Leave progress bars displayed in terminal",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--leave_progress_bars"
+                ],
+                "choices": [],
+                "default": false,
+                "dest": "leave_progress_bars"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--media_dir",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "media_dir",
+                "help": "Directory to write media",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--media_dir"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "media_dir"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "813b4892-e603-4d7f-822e-8878b1a67a11",
+              "type": "RadioGroup",
+              "cli_type": "optional",
+              "group_name": "Choose Option",
+              "required": false,
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "type": "local",
+                  "test": "lambda x: True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              },
+              "data": {
+                "commands": [
+                  [
+                    "--video_dir"
+                  ]
+                ],
+                "widgets": [
+                  {
+                    "id": "--video_dir",
+                    "type": "TextField",
+                    "cli_type": "optional",
+                    "required": false,
+                    "data": {
+                      "display_name": "video_dir",
+                      "help": "Directory to write file tree for video",
+                      "required": false,
+                      "nargs": "",
+                      "commands": [
+                        "--video_dir"
+                      ],
+                      "choices": [],
+                      "default": null,
+                      "dest": "video_dir"
+                    },
+                    "options": {
+                      "error_color": "#ea7878",
+                      "label_color": "#000000",
+                      "help_color": "#363636",
+                      "full_width": false,
+                      "validator": {
+                        "test": "True",
+                        "message": ""
+                      },
+                      "external_validator": {
+                        "cmd": ""
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "--tex_dir",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "tex_dir",
+                "help": "Directory to write tex",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--tex_dir"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "tex_dir"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--text_dir",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "text_dir",
+                "help": "Directory to write text",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--text_dir"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "text_dir"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            },
+            {
+              "id": "--tex_template",
+              "type": "TextField",
+              "cli_type": "optional",
+              "required": false,
+              "data": {
+                "display_name": "tex_template",
+                "help": "Specify a custom TeX template file",
+                "required": false,
+                "nargs": "",
+                "commands": [
+                  "--tex_template"
+                ],
+                "choices": [],
+                "default": null,
+                "dest": "tex_template"
+              },
+              "options": {
+                "error_color": "#ea7878",
+                "label_color": "#000000",
+                "help_color": "#363636",
+                "full_width": false,
+                "validator": {
+                  "test": "True",
+                  "message": ""
+                },
+                "external_validator": {
+                  "cmd": ""
+                }
+              }
+            }
+          ],
+          "groups": [],
+          "description": null,
+          "options": {
+            "label_color": "#000000",
+            "description_color": "#363636",
+            "legacy": {
+              "required_cols": 2,
+              "optional_cols": 2
+            },
+            "columns": 2,
+            "padding": 10,
+            "show_border": false
+          }
+        }
+      ]
+    }
+  }
+}

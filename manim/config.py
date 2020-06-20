@@ -4,16 +4,16 @@ import os
 import sys
 import types
 
-from .utils.tex import *
-from . import constants
-from . import dirs
-from .logger import logger
+from manim.utils.tex import *
+from manim import constants
+from manim import dirs
+from manim.logger import logger
 
 __all__ = ["parse_cli", "get_configuration", "initialize_directories","register_tex_template","initialize_tex"]
 
 
-def parse_cli():
-    try:
+def parse_cli(parser=None):
+    if parser == None:
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "file",
@@ -145,11 +145,114 @@ def parse_cli():
             "--tex_template",
             help="Specify a custom TeX template file",
         )
-        return parser.parse_args()
+    else:
+        parser.add_argument(
+            "scene_names",
+            nargs="*",
+            help="Name of the Scene class you want to see",
+        )
+        parser.add_argument(
+            "-p", "--preview",
+            action="store_true",
+            help="Automatically open the saved file once its done",
+        )
+        parser.add_argument(
+            "-w", "--write_to_movie",
+            action="store_true",
+            help="Render the scene as a movie file",
+        )
+        parser.add_argument(
+            "-s", "--save_last_frame",
+            action="store_true",
+            help="Save the last frame",
+        )
+        parser.add_argument(
+            "--dry_run",
+            action="store_true",
+            help= "Do a dry run (render scenes but generate no output files)",
+        )
+        parser.add_argument(
+            "-l", "--low_quality",
+            action="store_true",
+            help="Render at low quality (for fastest rendering)",
+        ),
+        parser.add_argument(
+            "-m", "--medium_quality",
+            action="store_true",
+            help="Render at medium quality (for much faster rendering)",
+        ),
+        parser.add_argument(
+            "-e", "--high_quality",
+            action="store_true",
+            help="Render at high quality (for slightly faster rendering)",
+        ),
+        parser.add_argument(
+            "-k", "--four_k",
+            action="store_true",
+            help="Render at 4K quality (slower rendering)",
+        ),
+        parser.add_argument(
+            "-g", "--save_pngs",
+            action="store_true",
+            help="Save each frame as a png",
+        )
+        parser.add_argument(
+            "-i", "--save_as_gif",
+            action="store_true",
+            help="Save the video as gif",
+        )
+        parser.add_argument(
+            "-f", "--show_file_in_finder",
+            action="store_true",
+            help="Show the output file in finder",
+        )
+        parser.add_argument(
+            "-t", "--transparent",
+            action="store_true",
+            help="Render to a movie file with an alpha channel",
+        )
+        parser.add_argument(
+            "-q", "--quiet",
+            action="store_true",
+            help="",
+        )
+        parser.add_argument(
+            "-a", "--write_all",
+            action="store_true",
+            help="Write all the scenes from a file",
+        )
+        parser.add_argument(
+            "-o", "--file_name",
+            help="Specify the name of the output file, if"
+                 " it should be different from the scene class name",
+        )
+        parser.add_argument(
+            "-n", "--start_at_animation_number",
+            help="Start rendering not from the first animation, but"
+                 " from another, specified by its index.  If you pass"
+                 " in two comma separated values, e.g. \"3,6\", it will end"
+                 " the rendering at the second value",
+        )
+        parser.add_argument(
+            "-r", "--resolution",
+            help="Resolution, passed as \"height,width\"",
+        )
+        parser.add_argument(
+            "-c", "--color",
+            help="Background color",
+        )
+        parser.add_argument(
+            "--sound",
+            action="store_true",
+            help="Play a success/failure sound",
+        )
+        parser.add_argument(
+            "--leave_progress_bars",
+            action="store_true",
+            help="Leave progress bars displayed in terminal",
+        )
+    return parser.parse_args()
 
-    except argparse.ArgumentError as err:
-        logger.error(str(err))
-        sys.exit(2)
 
 
 def get_configuration(args):
