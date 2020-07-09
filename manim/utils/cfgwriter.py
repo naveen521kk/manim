@@ -1,6 +1,8 @@
 from os import path
 import configparser
 
+from .config_utils import successfully_read_files
+
 from rich.console import Console
 from rich.progress import track
 from rich.color import Color
@@ -28,8 +30,8 @@ def main():
     console = Console()
     config = configparser.ConfigParser()
     config.read(
-        path.abspath(path.join(__file__,"../../default.cfg"))
-        )
+        successfully_read_files
+    )
     default = {
         "logging.keyword": "bold yellow",
         "logging.level.notset": "dim",
