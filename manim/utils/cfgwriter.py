@@ -1,4 +1,6 @@
+from os import path
 import configparser
+
 from rich.console import Console
 from rich.progress import track
 from rich.color import Color
@@ -25,7 +27,9 @@ def check_valid_colour(color):
 def main():
     console = Console()
     config = configparser.ConfigParser()
-    config.read("../default.cfg")
+    config.read(
+        path.abspath(path.join(__file__,"../../default.cfg"))
+        )
     default = {
         "logging.keyword": "bold yellow",
         "logging.level.notset": "dim",
