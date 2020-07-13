@@ -40,15 +40,17 @@ def main():
     config = configparser.ConfigParser()
     config.read(successfully_read_files)
     default = config["logger"]
+
     console.print(
-        "[yellow bold]Manim Logger Configuration Editor[/yellow bold]", justify="center"
-    )
+        "[yellow bold]Manim Configuration File Writer[/yellow bold]", justify="center"
+        )
     console.print(
         "[red]The default colour is shown as input Statement.\nIf left empty default value will be assigned.[/red]"
-    )
+        )
     console.print(
-        "[magenta]Please follow the link for available styles.[/magenta][link=https://rich.readthedocs.io/en/latest/style.html]docs[/link]"
-    )
+        "[magenta] For a full list of styles, visit[/magenta] https://rich.readthedocs.io/en/latest/style.html"
+        )
+
     for key in default:
         temp = default[key]
         del default[key]
@@ -62,7 +64,7 @@ def main():
                 console.print(
                     "[red bold]Your Style is not valid. Try again.[/red bold]"
                 )
-                console.print("Enter the Style for %s" % key + ":", style=key, end="")
+                console.print(f"Enter the Style for {key} : " , style=key, end="")
                 temp = input()
             else:
                 default[key] = temp
