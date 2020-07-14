@@ -45,13 +45,13 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install ffmpeg
           choco install wget
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
           wget https://tug.org/texlive/files/tl64.bat --no-check-certificate -O install-tex.bat
-          install-tex.bat
+          ./install-tex.bat
+          choco install miktex
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
