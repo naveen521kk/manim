@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
         python: [3.6, 3.7, 3.8]
 
     steps:
@@ -64,4 +64,6 @@ jobs:
 
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
-        run: pytest --skip_end_to_end -rs
+        run: |
+          ffmpeg
+          pytest --skip_end_to_end -rs
