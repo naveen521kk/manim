@@ -45,6 +45,7 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
+          choco install ffmpeg
           choco install wget
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
