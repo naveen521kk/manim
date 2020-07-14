@@ -49,12 +49,13 @@ jobs:
           choco install wget
           wget https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
           dir
-          7z x temp.zip -o.
+          7z x temp.zip
           rm temp.zip
           dir
-          miktexsetup.exe --verbose --package-set=essential --local-package-repository=./file_temp_latex download
-          miktexsetup.exe --verbose --local-package-repository=./file_temp_latex --modify-path install
-          cmd.exe //c "RefreshEnv.cmd" 
+          miktexsetup --verbose --package-set=essential --local-package-repository=./file_temp_latex download
+          miktexsetup --verbose --local-package-repository=./file_temp_latex --modify-path install
+          cmd.exe //c "RefreshEnv.cmd"
+          latex --version 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
