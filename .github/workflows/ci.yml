@@ -46,7 +46,14 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install ffmpeg
-          
+          curl -sSL https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
+          dir
+          7z x temp.zip -o.
+          rm temp.zip
+          dir
+          miktexsetup.exe --verbose --package-set=essential --local-package-repository=./file_temp_latex download
+          miktexsetup.exe --verbose --local-package-repository=./file_temp_latex --modify-path install
+          cmd.exe //c "RefreshEnv.cmd" 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
@@ -66,12 +73,4 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           ffmpeg
-          wget https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
-          dir
-          unzip temp.zip
-          rm temp.zip
-          dir
-          miktexsetup.exe --verbose --package-set=essential --local-package-repository=./file_temp_latex download
-          miktexsetup.exe --verbose --local-package-repository=./file_temp_latex --modify-path install
-          cmd.exe //c "RefreshEnv.cmd" 
           pytest --skip_end_to_end -rs
