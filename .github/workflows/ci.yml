@@ -45,8 +45,8 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install ffmpeg
-          choco install wget
+          choco install --no-progress ffmpeg
+          choco install --no-progress wget
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
           ./tl-install.exe
           latex -version
