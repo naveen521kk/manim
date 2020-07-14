@@ -45,15 +45,14 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install --no-progress ffmpeg
           choco install --no-progress wget
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
-          7z e tl-install.zip -otl
-          cd tl\install-tl-20200713
-          .\install-tl-windows.bat -no-gui -persistent-downloads text
+          7z e tl-install.zip -otexlive
+          cd texlive\install-tl-20200713
+          ./install-tl-windows.bat -no-gui -persistent-downloads text
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
