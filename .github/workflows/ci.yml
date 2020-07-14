@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest]
-        python: [3.6, 3.7, 3.8]
+        python: [3.7]
 
     steps:
       - name: Checkout the repository
@@ -46,7 +46,8 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install ffmpeg
-          curl -sSL https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
+          choco install wget
+          wget https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
           dir
           7z x temp.zip -o.
           rm temp.zip
