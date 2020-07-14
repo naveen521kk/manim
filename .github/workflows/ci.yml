@@ -47,10 +47,13 @@ jobs:
         run: |
           choco install --no-progress ffmpeg
           choco install --no-progress wget
+      - name: Install Latex (Windows)
+        if: runner.os == 'Windows'
+        run: |
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
           ./tl-install.exe -no-gui -persistent-downloads text
-          cmd.exe //c "RefreshEnv.cmd"
-          latex -version
+          ./tl-install.exe -gui -persistent-downloads text
+          ./tl-install.exe -gui text
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
