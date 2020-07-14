@@ -52,8 +52,8 @@ jobs:
           7z x temp.zip
           rm temp.zip
           dir
-          miktexsetup --verbose --package-set=essential --local-package-repository=./file_temp_latex download
-          miktexsetup --verbose --local-package-repository=./file_temp_latex --modify-path install
+          miktexsetup.exe --verbose --package-set=essential --local-package-repository=./file_temp_latex download
+          miktexsetup.exe --verbose --local-package-repository=./file_temp_latex --modify-path install
           cmd.exe //c "RefreshEnv.cmd"
           latex --version 
       - name: Install Pycairo (Non-Windows)
