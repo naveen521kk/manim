@@ -49,9 +49,9 @@ jobs:
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
-          wget https://tug.org/texlive/files/tl64.bat --no-check-certificate -O install-tex.bat
-          ./install-tex.bat
-          choco install miktex
+          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
+          ./tl-install.exe -gui text
+
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
