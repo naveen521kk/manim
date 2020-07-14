@@ -47,8 +47,9 @@ jobs:
         run: |
           choco install ffmpeg
           choco install wget
-          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.bat --no-check-certificate -O tl-install.bat
-          ./tl-install.bat 
+          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
+          ./tl-install.exe
+          latex -version
           cmd.exe //c "RefreshEnv.cmd"
           latex -version
 
