@@ -48,8 +48,7 @@ jobs:
           choco install --no-progress ffmpeg
           choco install --no-progress wget
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
-          ./tl-install.exe
-          latex -version
+          ./tl-install.exe -no-gui -persistent-downloads text
           cmd.exe //c "RefreshEnv.cmd"
           latex -version
 
