@@ -50,10 +50,10 @@ jobs:
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
-          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe --no-check-certificate -O tl-install.exe
-          ./tl-install.exe -no-gui -persistent-downloads text
-          ./tl-install.exe -gui -persistent-downloads text
-          ./tl-install.exe -gui text
+          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
+          7z e tl-install.zip -otl
+          cd tl\install-tl-20200713
+          .\install-tl-windows.bat -no-gui -persistent-downloads text
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
