@@ -53,7 +53,8 @@ jobs:
           7z x tl-install.zip -otexlive
           dir
           cd texlive
-          cd install-tl-20200713
+          cd *
+          dir
           ./install-tl-windows.bat -no-gui -persistent-downloads text
 
       - name: Install Pycairo (Non-Windows)
