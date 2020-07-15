@@ -57,8 +57,9 @@ jobs:
           cd *
           dir
           ./install-tl-windows.bat --help
-          ./install-tl-windows.bat -gui text || I
-          latex --version
+          ./install-tl-windows.bat -gui text
+          I
+
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
@@ -72,4 +73,6 @@ jobs:
         run: pip install . pytest
 
       - name: Run tests (Non-Windows)
-        run: pytest
+        run: |
+          latex --version
+          pytest
