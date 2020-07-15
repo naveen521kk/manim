@@ -59,6 +59,9 @@ jobs:
           7z x latex.zip -otexfinal
           cd texfinal
           cd MikTex
+          wget -q https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
+          7z x temp.zip
+          dir
           ./miktexsetup.exe --verbose --local-package-repository="C:\miktex-repository" --package-set=essential download
           ./miktexsetup.exe --verbose --local-package-repository="C:\miktex-repository" --user-config="<APPDATA>\MiKTeX" --user-data="<LOCALAPPDATA>\MiKTeX" --user-install="<APPDATA>\MiKTeX" --modify-path --print-info-only install
           ./miktexsetup.exe --verbose --package-set=essential --local-package-repository=./file_temp_latex download
