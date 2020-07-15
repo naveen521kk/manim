@@ -56,7 +56,7 @@ jobs:
           dir
           cd ../
           miktexsetup --verbose --local-package-repository=C:\miktex-repository --package-set=complete download
-          miktexsetup --verbose --local-package-repository=C:\miktex-repository --shared --user-config="<APPDATA>\MiKTeX" --user-data="<LOCALAPPDATA>\MiKTeX" --user-install=<APPDATA>\MiKTeX" --print-info-only install
+          miktexsetup --verbose --local-package-repository=C:\miktex-repository --shared --user-config="<APPDATA>\MiKTeX" --user-data="<LOCALAPPDATA>\MiKTeX" --user-install="<APPDATA>\MiKTeX" --print-info-only install
           latex --version
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
