@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
-          7z e tl-install.zip -otexlive
+          7z x tl-install.zip -otexlive
           cd texlive\install-tl-20200713
           ./install-tl-windows.bat -no-gui -persistent-downloads text
 
