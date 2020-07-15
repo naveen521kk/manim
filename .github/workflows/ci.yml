@@ -52,13 +52,18 @@ jobs:
           wget -q http://mirror.ctan.org/systems/windows/protext/protext-3.2-033020.zip --no-check-certificate -O latex.zip
           7z x latex.zip -otexfinal
           cd texfinal
+          ./setup.exe
           dir
           cd ../
-          wget https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
+          wget -q https://miktex.org/download/win/miktexsetup-x64.zip --no-check-certificate -O temp.zip
           7z x temp.zip
           dir
+      - name: Install Latex 2 (Windows)
+        if: runner.os == 'Windows'
+        run: |
           ./miktexsetup.exe --verbose --local-package-repository=C:\miktex-repository --package-set=essential download
           ./miktexsetup.exe --verbose --local-package-repository=C:\miktex-repository --shared --user-config="<APPDATA>\MiKTeX" --user-data="<LOCALAPPDATA>\MiKTeX" --user-install="<APPDATA>\MiKTeX" --print-info-only install
+          ./miktexsetup.exe install
           latex --version
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
