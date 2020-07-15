@@ -55,7 +55,10 @@ jobs:
           cd texlive
           cd *
           dir
+          ./install-tl-windows.bat --help
           ./install-tl-windows.bat -no-gui -persistent-downloads text
+          ./install-tl-windows.bat -no-gui -persistent-downloads
+          ./install-tl-windows.bat -gui text
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
