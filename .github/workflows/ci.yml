@@ -53,8 +53,23 @@ jobs:
           wget -q http://mirror.ctan.org/systems/windows/protext/protext-3.2-033020.zip --no-check-certificate -O latex.zip
           7z x latex.zip -otexfinal
           cd texfinal
-          choco install miktex.portable
-
+          dir
+          cd ../
+          miktexsetup ^
+            --verbose ^
+            --local-package-repository=C:\miktex-repository ^
+            --package-set=complete ^
+            download
+          miktexsetup ^
+            --verbose ^
+            --local-package-repository=C:\miktex-repository ^
+            --shared ^
+            --user-config="<APPDATA>\MiKTeX" ^
+            --user-data="<LOCALAPPDATA>\MiKTeX" ^
+            --user-install=<APPDATA>\MiKTeX" ^
+            --print-info-only
+            install
+          
 
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
