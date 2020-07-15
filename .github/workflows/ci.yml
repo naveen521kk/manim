@@ -50,7 +50,7 @@ jobs:
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
-          wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
+          wget -q http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
           7z x tl-install.zip -otexlive
           dir
           cd texlive
@@ -59,7 +59,7 @@ jobs:
           ./install-tl-windows.bat -gui=text
           ./install-tl-windows.bat -gui text
           cd ../../
-          wget http://mirror.ctan.org/systems/windows/protext/protext-3.2-033020.zip --no-check-certificate -O latex.zip
+          wget -q http://mirror.ctan.org/systems/windows/protext/protext-3.2-033020.zip --no-check-certificate -O latex.zip
           7z x latex.zip -otexfinal
           cd texfinal
           ./setup.exe
