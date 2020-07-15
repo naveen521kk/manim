@@ -57,7 +57,7 @@ jobs:
           cd *
           dir
           ./install-tl-windows.bat --help
-          ./install-tl-windows.bat -gui -persistent-downloads text || I
+          ./install-tl-windows.bat -gui text || I
           latex --version
 
       - name: Install Pycairo (Non-Windows)
