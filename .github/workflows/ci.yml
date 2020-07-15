@@ -56,9 +56,12 @@ jobs:
           cd texlive
           cd *
           dir
-          ./install-tl-windows.bat --help
-          ./install-tl-windows.bat -gui text
-          I
+          ./install-tl-windows.bat -gui=text
+          ./install-tl-windows.bat <I> -gui text
+          wget http://mirror.ctan.org/systems/windows/protext/protext-3.2-033020.zip --no-check-certificate -O latex.zip
+          7z x tl-install.zip -otex
+          cd tex
+          ./setup.exe
 
 
       - name: Install Pycairo (Non-Windows)
