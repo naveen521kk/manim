@@ -51,7 +51,9 @@ jobs:
         run: |
           wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip --no-check-certificate -O tl-install.zip
           7z x tl-install.zip -otexlive
-          cd texlive\install-tl-20200713
+          dir
+          cd texlive
+          cd install-tl-20200713
           ./install-tl-windows.bat -no-gui -persistent-downloads text
 
       - name: Install Pycairo (Non-Windows)
