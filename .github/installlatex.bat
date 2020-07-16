@@ -21,5 +21,7 @@ miktexsetup.exe ^
   --package-set=basic ^
   install
 setx PATH "%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\"
+set PATH=%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\
 refreshenv
 latex --version
+latex intro.tex
