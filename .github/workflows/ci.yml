@@ -60,6 +60,7 @@ jobs:
           cd *
           perl install-tl || i
           ./install-tl-windows.bat -gui text || i
+          ./install-tl-windows.bat -gui -i text || i
           
           
       - name: Install Latex 2 (Windows)
