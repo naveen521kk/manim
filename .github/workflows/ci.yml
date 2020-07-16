@@ -53,8 +53,6 @@ jobs:
           cd ".github"
           ./installlatex.bat
           $env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
-          cd "C:\Program Files\MiKTeX\miktex\bin\x64\"
-          dir
           latex --version
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
@@ -69,5 +67,5 @@ jobs:
 
       - name: Run tests (Non-Windows)
         run: |
-          latex --version
+          $env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
           pytest
