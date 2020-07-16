@@ -53,7 +53,6 @@ jobs:
           wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x86/miktexsetup-4.0.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
           unzip ./miktexsetup-4.0-x64.zip
           ./miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=basic download
-          $now=Convert-Path .
           ./miktexsetup.exe --local-package-repository=C:\temp\miktex --package-set=essential install
           refreshenv
           $env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
