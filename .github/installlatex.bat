@@ -1,8 +1,9 @@
+@echo off
 echo "Download miktexsetup and Uzip it"
 wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
 unzip ./miktexsetup-4.0-x64.zip
 echo "Starting Miktex Install"
-./miktexsetup.exe ^
+miktexsetup.exe ^
   --verbose ^
   --modify-path ^
   --local-package-repository="C:\temp\miktex" ^
@@ -10,7 +11,7 @@ echo "Starting Miktex Install"
   --shared=yes ^
   download
 echo "Completed Downloading Installing Now"
-./miktexsetup.exe ^
+miktexsetup.exe ^
   --verbose ^
   --modify-path ^
   --local-package-repository="C:\temp\miktex" ^
