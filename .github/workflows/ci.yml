@@ -48,8 +48,8 @@ jobs:
           choco install --no-progress wget
           wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
           unzip ./miktexsetup-4.0-x64.zip
-          ./miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=basic download
-          ./miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=essential install
+          ./miktexsetup --verbose --shared=no --local-package-repository=C:\temp\miktex --package-set=essential download
+          ./miktexsetup --verbose --shared=no --local-package-repository=C:\temp\miktex --package-set=essential install
           latex --version
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
