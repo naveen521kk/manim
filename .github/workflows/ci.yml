@@ -66,11 +66,12 @@ jobs:
           $mainLatex=Convert-Path tlpkg\tlperl\bin
           $env:Path += ";"+$mainLatex
           echo $env:PATH
-          perl install-tl | i
+          perl install-tl
+          perl install-tl || i
           echo "Try1"
           perl install-tl && i
           echo "Try2"
-          perl install-tl || i
+          perl install-tl | i
           echo "Failed"
           ./install-tl-windows.bat -gui text || i
           ./install-tl-windows.bat -gui -i text || i
