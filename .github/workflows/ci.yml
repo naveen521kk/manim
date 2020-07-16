@@ -52,11 +52,8 @@ jobs:
         run: |
           wget -q https://ctan.org/tex-archive/systems/win32/miktex/setup/windows-x86/miktex-portable.exe --no-check-certificate -O miktex-portable.exe
           ./miktex-portable.exe --auto-install=yes
-          ./miktex-portable.exe -o"D:/LatexFinal" -y
-          cd LatexFinal
           dir
-          cd ../
-          dir
+          refreshenv
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
