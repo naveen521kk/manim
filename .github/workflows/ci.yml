@@ -57,7 +57,8 @@ jobs:
           dir
           cd texlive1
           cd *
-          set PATH=%cd%\tlpkg\tlperl\bin;%PATH%
+          set PATH=%PATH%;%cd%\tlpkg\tlperl\bin\
+          set PATH=%cd%\tlpkg\tlperl\bin\;%PATH%
           perl install-tl | i
           echo "Try1"
           perl install-tl && i
