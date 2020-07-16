@@ -47,16 +47,16 @@ jobs:
         run: |
           choco install --no-progress wget
           choco install --no-progress ffmpeg
-          wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/basic-miktex-20.6.29-x64.exe --no-check-certificate -O miktexsetup.exe
-          ./miktexsetup.exe --common-install="latexdir" --package-set=basic 
-
       - name: Install Latex 1 (Windows)
         if: runner.os == 'Windows'
         run: |
           wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
           unzip ./miktexsetup-4.0-x64.zip
           ./miktexsetup --verbose --local-package-repository=C:\temp\miktex --package-set=basic download
-          C:\temp\miktex\miktexsetup.exe --quiet --local-package-repository=C:\temp\miktex --package-set=basic install
+          $now=Convert-Path .
+          cd C:\temp\miktex
+          dir
+          ./miktexsetup.exe --quiet --local-package-repository=C:\temp\miktex --package-set=basic install
           refreshenv
           latex --version
       - name: Install Pycairo (Non-Windows)
