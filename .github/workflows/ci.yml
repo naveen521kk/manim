@@ -46,7 +46,6 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install --no-progress wget
-          choco install activeperl
       - name: Install Latex (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -58,7 +57,13 @@ jobs:
           dir
           cd texlive1
           cd *
+          set PATH=%cd%\tlpkg\tlperl\bin;%PATH%
+          perl install-tl | i
+          echo "Try1"
+          perl install-tl && i
+          echo "Try2"
           perl install-tl || i
+          echo "Failed"
           ./install-tl-windows.bat -gui text || i
           ./install-tl-windows.bat -gui -i text || i
           
