@@ -62,16 +62,6 @@ jobs:
           $env:Path += ";"+$mainLatex
           echo $env:PATH
           perl install-tl
-          perl install-tl || i
-          echo "Try1"
-          perl install-tl && i
-          echo "Try2"
-          perl install-tl | i
-          echo "Failed"
-          ./install-tl-windows.bat -gui text || i
-          ./install-tl-windows.bat -gui -i text || i
-          
-          
       - name: Install Latex 2 (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -79,6 +69,7 @@ jobs:
           unzip ./miktexsetup-4.0-x64.zip
           ./miktexsetup --verbose --modify-path --shared=no --local-package-repository=C:\temp\miktex --package-set=essential download
           ./miktexsetup --verbose --modify-path --shared=no --local-package-repository=C:\temp\miktex --package-set=essential install
+          refreshenv
           latex --version
           latex --version
       - name: Install Pycairo (Non-Windows)
