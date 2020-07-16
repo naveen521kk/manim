@@ -20,6 +20,6 @@ miktexsetup.exe ^
   --user-install="<APPDATA>\MiKTeX" ^
   --package-set=basic ^
   install
-$env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
+setx PATH "%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\"
 refreshenv
 latex --version
