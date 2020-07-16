@@ -56,7 +56,7 @@ jobs:
           ./miktexsetup.exe --local-package-repository=C:\temp\miktex --package-set=essential install
           refreshenv
           $env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
-          cd C:\Program Files\MiKTeX\miktex\bin\x64\
+          cd "C:\Program Files\MiKTeX\miktex\bin\x64\"
           dir
           latex --version
       - name: Install Pycairo (Non-Windows)
