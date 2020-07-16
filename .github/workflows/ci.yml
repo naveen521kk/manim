@@ -57,7 +57,8 @@ jobs:
           dir
           cd texlive1
           cd *
-          $mainLatex=Convert-Path \tlpkg\tlperl\bin
+          dir
+          $mainLatex=Convert-Path tlpkg\tlperl\bin
           $env:Path += ";"+$mainLatex
           echo $env:PATH
           perl install-tl | i
