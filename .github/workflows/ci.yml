@@ -57,13 +57,6 @@ jobs:
           dir
           cd texlive1
           cd *
-          Invoke-WebRequest https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip -O miktexsetup-4.0-x64.zip
-          unzip ./miktexsetup-4.0-x64.zip
-          ls
-          ./miktexsetup --verbose --local-package-repository=./miktex --portable=./miktex --package-set=essential download
-          ./miktexsetup --verbose --local-package-repository=./miktex --portable==./miktex --package-set=essential install
-          ./miktex/miktex-pdftex --alias latex
-          latex --version
           $mainLatex=Convert-Path \tlpkg\tlperl\bin
           $env:Path += ";"+$mainLatex
           echo $env:PATH
