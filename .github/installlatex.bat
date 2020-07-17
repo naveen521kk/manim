@@ -20,9 +20,14 @@ miktexsetup.exe ^
   --user-install="<APPDATA>\MiKTeX" ^
   --package-set=basic ^
   install
+dir "C:\Program Files\MiKTeX\miktex\bin\x64\"
+dir "C:\Program Files\MiKTeX\miktex\bin\x86\"
 setx PATH "%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\"
+setx PATH "%PATH%;C:\Program Files\MiKTeX\miktex\bin\x86\"
 set PATH=%PATH%;C:\Program Files\MiKTeX\miktex\bin\x86\
 set PATH=%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\
 refreshenv
+mpm --admin --update
+mpm --admin --install=standalone --install=preview --install=doublestroke --install=relsize --install=fundus-calligra --install=wasysym --install=physics --install=rsfs --install=wasy --install=cm-super
 latex --version
 latex intro.tex
