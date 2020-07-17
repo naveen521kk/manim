@@ -1,6 +1,6 @@
 @echo off
 echo "Download miktexsetup and Uzip it"
-wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
+wget -q https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x86/miktexsetup-4.0.zip --no-check-certificate -O miktexsetup-4.0-x64.zip
 unzip ./miktexsetup-4.0-x64.zip
 echo "Starting Miktex Install"
 miktexsetup.exe ^
@@ -21,6 +21,7 @@ miktexsetup.exe ^
   --package-set=basic ^
   install
 setx PATH "%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\"
+set PATH=%PATH%;C:\Program Files\MiKTeX\miktex\bin\x86\
 set PATH=%PATH%;C:\Program Files\MiKTeX\miktex\bin\x64\
 refreshenv
 latex --version
