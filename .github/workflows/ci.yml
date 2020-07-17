@@ -55,6 +55,8 @@ jobs:
           $env:Path += ";C:\Program Files\MiKTeX\miktex\bin\x64\"
           latex --version
           latex intro.tex
+          mpm --admin --update
+          latex intro.tex
           echo "Check from above"
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
