@@ -78,7 +78,6 @@ jobs:
           Invoke-WebRequest https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.3.1-win64-static.zip -O ffmpeg-4.3.1-win64-static.zip
           7z x "$PWD\ffmpeg-4.3.1-win64-static.zip" -o"$env:APPDATA\FFmpeg"
           $env:Path += ";" + "$env:APPDATA\FFmpeg\ffmpeg-4.3.1-win64-static\bin"
-          tree
           echo "::set-env name=Path::$env:Path"
 
       - name: Install Pycairo (Non-Windows)
