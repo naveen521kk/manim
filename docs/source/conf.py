@@ -2,7 +2,7 @@
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -17,18 +17,20 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Manim'
-copyright = '2019, EulerTour'
-author = 'EulerTour'
+project = 'manim'
+copyright = '2020, The Manim Community Dev Team'
+author = 'The Manim Community Dev Team'
 
 
 # -- General configuration ---------------------------------------------------
-master_doc = 'index'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx_rtd_theme',
+    'recommonmark',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,4 +52,4 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['assets']
+html_static_path = ['_static']
