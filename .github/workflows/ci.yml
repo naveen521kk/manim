@@ -67,10 +67,9 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          Try {Invoke-WebRequest https://yihui.org/gh/tinytex/tools/install-windows.bat -O install_tinytex.bat}
-          Catch {Invoke-WebRequest https://raw.githubusercontent.com/yihui/tinytex/master/tools/install-windows.bat -O install_tinytex.bat}
-          Start-Process install_tinytex.bat -NoNewWindow -Wait
-          $env:Path += ";" + $env:APPDATA + "\TinyTeX\bin\win32"
+          Invoke-WebRequest https://ci.appveyor.com/api/projects/yihui/tinytex/artifacts/TinyTeX.zip?job=image:%20Visual%20Studio%202019 -O TinyTex.zip
+          Expand-Archive -LiteralPath "$PWD\TinyTex.zip" -DestinationPath "$PWD\LatexWindows"
+          "$PWD\LatexWindows\bin\win32\tlmgr" path add
           tlmgr install standalone preview doublestroke ms setspace rsfs relsize ragged2e fundus-calligra microtype wasysym physics dvisvgm jknapltx wasy cm-super babel-english
           choco install --no-progress ffmpeg
           choco install --no-progress sox.portable
