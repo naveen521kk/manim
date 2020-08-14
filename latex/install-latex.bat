@@ -34,11 +34,11 @@ cd ..
 for /d %%G in ("install-tl-*") do rd /s /q "%%~G"
 
 rem install all custom packages
-@echo off
-setlocal enabledelayedexpansion
-set "pkgs="
-for /F %%a in (pkgs-custom.txt) do set "pkgs=!pkgs! %%a"
-@echo on
+rem @echo off
+rem setlocal enabledelayedexpansion
+rem set "pkgs="
+rem for /F %%a in (pkgs-custom.txt) do set "pkgs=!pkgs! %%a"
+rem @echo on
 
 del pkgs-custom.txt
 
