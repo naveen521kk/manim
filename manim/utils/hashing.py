@@ -10,14 +10,35 @@ ALREADY_PROCESSED_ID = set()
 
 
 class CustomEncoder(json.JSONEncoder):
+    def merge_attribs_in_dict(self, obj):
+        """Scans the passed dictionary for any values that have __dict__ attributes and
+        replaces such objects with their __dict__s. If any values within that __dict__
+        themselves have __dict__ attributes, the values are replaced with their __dict__s recursively.
+
+        Parameters
+        ----------
+        obj : :class:`dict`
+            The dictionary object within whose values may possibly have __dict__s
+
+        Returns
+        -------
+        :class:`dict`
+            The fully "expanded" dict, where no value has a __dict__ attribute.
+        """
+        objcopy = obj.copy()
+        for key in objcopy:
+            if hasattr(objcopy[key], "__dict__"):
+                objcopy[key] = self.merge_attribs_in_dict(objcopy[key].__dict__)
+        return objcopy
+
     def default(self, obj):
         """
         This method is used to serialize objects to JSON format.
-        
+
         If obj is a function, then it will return a dict with two keys : 'code', for the code source, and 'nonlocals' for all nonlocalsvalues. (including nonlocals functions, that will be serialized as this is recursive.)
         if obj is a np.darray, it converts it into a list.
-        if obj is an object with __dict__ attribute, it returns its __dict__.
-        Else, will let the JSONEncoder do the stuff, and throw an error if the type is not suitable for JSONEncoder. 
+        if obj is an object with __dict__ attribute, it returns its __dict__. If any value in that __dict__ is an object with __dict__ attribute, the object is replaced with it's __dict__, recursively.
+        Else, will let the JSONEncoder do the stuff, and throw an error if the type is not suitable for JSONEncoder.
 
         Parameters
         ----------
@@ -43,8 +64,7 @@ class CustomEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return list(obj)
         elif hasattr(obj, "__dict__"):
-            temp = getattr(obj, "__dict__")
-            # pprint(self._encode_dict(temp))
+            temp = self.merge_attribs_in_dict(getattr(obj, "__dict__"))
             return self._encode_dict(temp)
         elif isinstance(obj, np.uint8):
             return int(obj)
@@ -64,7 +84,7 @@ class CustomEncoder(json.JSONEncoder):
         ----------
         obj : Any
             The obj to be cleaned.
-        
+
         Returns
         -------
         Any
@@ -87,12 +107,12 @@ class CustomEncoder(json.JSONEncoder):
         return obj
 
     def _handle_already_processed(self, obj):
-        """Handle if an object has been already processed by checking the id of the object. 
+        """Handle if an object has been already processed by checking the id of the object.
 
-        Parameters 
+        Parameters
         ----------
-        obj : Any 
-            The obj to check. 
+        obj : Any
+            The obj to check.
 
         Returns
         -------
@@ -118,7 +138,7 @@ def get_json(obj):
 
     Returns
     -------
-    :class:`str` 
+    :class:`str`
         The flattened object
     """
     return json.dumps(obj, cls=CustomEncoder)
@@ -162,7 +182,7 @@ def get_hash_from_play_call(camera_object, animations_list, current_mobjects_lis
 
     Returns
     -------
-    :class:`str` 
+    :class:`str`
         A string concatenation of the respective hashes of `camera_object`, `animations_list` and `current_mobjects_list`, separated by `_`.
     """
     camera_json = get_json(get_camera_dict_for_hashing(camera_object))
