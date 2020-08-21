@@ -3,7 +3,7 @@ import zlib
 import inspect
 import copy
 import numpy as np
-from types import ModuleType
+from types import ModuleType, MethodType
 
 
 ALREADY_PROCESSED_ID = set()
@@ -20,6 +20,8 @@ class CustomEncoder(json.JSONEncoder):
         ----------
         obj : :class:`dict`
             The dictionary object within whose values may possibly have __dict__s
+        hashed : :class:`set`
+            The set containing already mobjects that have already been replaced by their __dict__
 
         Returns
         -------
@@ -30,7 +32,11 @@ class CustomEncoder(json.JSONEncoder):
         for key in objcopy:
             if hasattr(objcopy[key], "__dict__") and id(obj[key]) not in hashed:
                 hashed.add(id(objcopy[key]))
-                objcopy[key] = self.merge_attribs_in_dict(objcopy[key].__dict__, hashed)
+                objcopy[key] = (
+                    inspect.getsource(objcopy[key])
+                    if isinstance(objcopy[key], MethodType)
+                    else self.merge_attribs_in_dict(objcopy[key].__dict__, hashed)
+                )
         return objcopy
 
     def default(self, obj):
