@@ -10,17 +10,18 @@ ALREADY_PROCESSED_ID = set()
 
 
 class CustomEncoder(json.JSONEncoder):
-    def merge_attribs_in_dict(self, obj, hashed=set()):
+    def extract_attribs_in_dict(self, obj, extracted=set()):
         """Scans the passed dictionary for any values that have __dict__ attributes and
         replaces such objects with their __dict__s. If any values within that __dict__
         themselves have __dict__ attributes, the values are replaced with their __dict__s recursively.
-        If those values have already been hashed sometime before, they are not replaced.
+        If those values have already been extracted sometime before, they are not replaced.
+        If it finds a method, it replaces the method with it's source code.
 
         Parameters
         ----------
         obj : :class:`dict`
             The dictionary object within whose values may possibly have __dict__s
-        hashed : :class:`set`
+        extracted : :class:`set`
             The set containing already mobjects that have already been replaced by their __dict__
 
         Returns
@@ -30,12 +31,12 @@ class CustomEncoder(json.JSONEncoder):
         """
         objcopy = obj.copy()
         for key in objcopy:
-            if hasattr(objcopy[key], "__dict__") and id(obj[key]) not in hashed:
-                hashed.add(id(objcopy[key]))
+            if hasattr(objcopy[key], "__dict__") and id(obj[key]) not in extracted:
+                extracted.add(id(objcopy[key]))
                 objcopy[key] = (
                     inspect.getsource(objcopy[key])
                     if isinstance(objcopy[key], MethodType)
-                    else self.merge_attribs_in_dict(objcopy[key].__dict__, hashed)
+                    else self.extract_attribs_in_dict(objcopy[key].__dict__, extracted)
                 )
         return objcopy
 
@@ -72,7 +73,7 @@ class CustomEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return list(obj)
         elif hasattr(obj, "__dict__"):
-            temp = self.merge_attribs_in_dict(getattr(obj, "__dict__"))
+            temp = self.extract_attribs_in_dict(getattr(obj, "__dict__"))
             return self._encode_dict(temp)
         elif isinstance(obj, np.uint8):
             return int(obj)
