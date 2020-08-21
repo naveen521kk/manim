@@ -10,10 +10,11 @@ ALREADY_PROCESSED_ID = set()
 
 
 class CustomEncoder(json.JSONEncoder):
-    def merge_attribs_in_dict(self, obj):
+    def merge_attribs_in_dict(self, obj, hashed=set()):
         """Scans the passed dictionary for any values that have __dict__ attributes and
         replaces such objects with their __dict__s. If any values within that __dict__
         themselves have __dict__ attributes, the values are replaced with their __dict__s recursively.
+        If those values have already been hashed sometime before, they are not replaced.
 
         Parameters
         ----------
@@ -27,8 +28,9 @@ class CustomEncoder(json.JSONEncoder):
         """
         objcopy = obj.copy()
         for key in objcopy:
-            if hasattr(objcopy[key], "__dict__"):
-                objcopy[key] = self.merge_attribs_in_dict(objcopy[key].__dict__)
+            if hasattr(objcopy[key], "__dict__") and id(obj[key]) not in hashed:
+                hashed.add(id(objcopy[key]))
+                objcopy[key] = self.merge_attribs_in_dict(objcopy[key].__dict__, hashed)
         return objcopy
 
     def default(self, obj):
