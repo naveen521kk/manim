@@ -112,7 +112,7 @@ class CustomEncoder(json.JSONEncoder):
         return obj
 
     def encode(self, obj):
-        return super().encode(self.default(obj))
+        return super().encode(self._encode_dict(obj))
 
 
 def get_json(obj):
