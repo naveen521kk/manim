@@ -3,10 +3,11 @@ on:
   push:
       branches:
         - master
+        - improve-cli
   pull_request:
       branches:
         - master
-        - improve-cli
+        
 
 jobs:
   format:
