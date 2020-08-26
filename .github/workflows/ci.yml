@@ -52,7 +52,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y ffmpeg
-          sudo apt-get -y install texlive texlive-latex-extra texlive-fonts-extra texlive-latex-recommended texlive-science texlive-fonts-extra tipa
+          wget -qO- "https://yihui.org/gh/tinytex/tools/install-unx.sh" | sh
+          tlmgr install standalone preview doublestroke ms setspace rsfs relsize ragged2e fundus-calligra microtype wasysym physics dvisvgm jknapltx wasy cm-super babel-english
 
       - name: Install system dependencies (MacOS)
         if: runner.os == 'macOS'
