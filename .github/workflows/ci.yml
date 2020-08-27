@@ -55,8 +55,9 @@ jobs:
           sudo apt update
           sudo apt install -y ffmpeg
           wget -qO- "https://yihui.org/gh/tinytex/tools/install-unx.sh" | sh
+          export PATH="$HOME/bin:$PATH"
           tlmgr install standalone preview doublestroke ms setspace rsfs relsize ragged2e fundus-calligra microtype wasysym physics dvisvgm jknapltx wasy cm-super babel-english
-
+          echo "::set-env name=PATH::$PATH"
       - name: Install system dependencies (MacOS)
         if: runner.os == 'macOS'
         run: |
