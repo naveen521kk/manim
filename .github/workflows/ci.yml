@@ -57,7 +57,7 @@ jobs:
           wget -qO- "https://yihui.org/gh/tinytex/tools/install-unx.sh" | sh
           export PATH="$HOME/bin:$PATH"
           tlmgr install standalone preview doublestroke ms setspace rsfs relsize ragged2e fundus-calligra microtype wasysym physics dvisvgm jknapltx wasy cm-super babel-english
-          echo "::set-env name=PATH::$PATH"
+          echo "::add-path::$HOME/bin"
       - name: Install system dependencies (MacOS)
         if: runner.os == 'macOS'
         run: |
