@@ -29,8 +29,8 @@ jobs:
         run: |
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
-          $blackVersion = python -c "'$($blackVer)'.split()[2]"
-          #git checkout -b "black-update-$($blackVersion)" "origin/master"
+          $blackVersion = python -c "print('$($blackVer)'.split()[2])"
+          git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
           black tests
           black example_scenes
