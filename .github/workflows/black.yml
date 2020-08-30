@@ -24,9 +24,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           try {
-          black --check manim
-          black --check tests
-          black --check example_scenes}
+          black --check manim | black --check tests | black --check example_scenes}
           catch {
           $env:GITHUB_TOKEN = $env:access_token
           $blackVersion = pip freeze | Select-String -Pattern "black"
