@@ -20,13 +20,15 @@ jobs:
         run: pip install black
         
       - name: Print Black Version if Failed
-        if: ${{ failure() }}
+        env:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           try {
           black --check --diff manim
           black --check --diff tests
           black --check --diff example_scenes}
           catch {
+          $env:GITHUB_TOKEN = $env:access_token
           $blackVersion = pip freeze | Select-String -Pattern "black"
           git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
