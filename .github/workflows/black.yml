@@ -26,7 +26,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $env:GITHUB_TOKEN = $env:access_token
-          $blackVersion = black --version
+          $blackVersion = Get-Version $(black --version)
           git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
           black tests
