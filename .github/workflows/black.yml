@@ -32,7 +32,13 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $pushBranch="black-update-$($blackVersion)"
           echo "::set-output name=pushbranch::$($pushBranch)"
-          git checkout -b "black-update-$($blackVersion)" "origin/master"
+          git pull
+          try{
+          git checkout -b $pushBranch "origin/master"} catch {
+          git branch -d $pushBranch
+          git push origin --delete $pushBranch
+          git checkout -b $pushBranch "origin/master"
+          }
           black manim
           black tests
           black example_scenes
@@ -54,5 +60,5 @@ jobs:
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}  `
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
-            -Body '{"title":"Black on Master - Automation","head":"naveen521kk:$env:headbranch","base":"master"}'
+            -Body '{"title":"Black on Master - Automation","head":"$($pushBranch)","base":"master"}'
           #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
