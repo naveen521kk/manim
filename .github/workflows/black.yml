@@ -1,4 +1,4 @@
-name: CI
+name: black
 on:
   workflow_dispatch:
   schedule:
