@@ -24,6 +24,7 @@ jobs:
       - name: Black
         run: black --check manim tests example_scenes
       - name: Print Black Version if Failed
+        continue-on-error: true
         if: ${{ failure() }}
         id: black-check
         run: |
@@ -52,10 +53,12 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-update-$($blackVersion)-$($date)"
+          echo "$pushBranch"
           $postContents = @{title="Black on Master - Automation";head="$($pushBranch)";base="master"} | ConvertTo-Json -Compress
+          echo "$postContents"
           Invoke-WebRequest `
             -Method POST `
-            -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}  `
+            -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
             -Body "$($postContents)"
-          #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
