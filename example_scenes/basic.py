@@ -10,9 +10,9 @@ from manim import *
 # Use -s to skip to the end and just save the final frame
 # Use the -p to have the animation (or image, if -s was
 # used) pop up once done.
-# Use -n <number> to skip ahead to the n'th animation of a scene.
-# Use -r <number> to specify a resolution (for example, -r 1080
-# for a 1920x1080 video)
+#Use -n <number> to skip ahead to the n'th animation of a scene.
+#Use -r <number> to specify a resolution (for example, -r 1080
+#for a 1920x1080 video)
 
 
 class OpeningManimExample(Scene):
@@ -20,9 +20,7 @@ class OpeningManimExample(Scene):
         title = TextMobject("This is some \\LaTeX")
         basel = TexMobject("\\sum_{n=1}^\\infty " "\\frac{1}{n^2} = \\frac{\\pi^2}{6}")
         VGroup(title, basel).arrange(DOWN)
-        self.play(
-            Write(title),
-            FadeInFrom(basel, UP),
+        self.play(Write(title),FadeInFrom(basel, UP),
         )
         self.wait()
 
