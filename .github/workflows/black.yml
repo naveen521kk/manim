@@ -30,9 +30,8 @@ jobs:
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
-          $pushBranch="black-update-$($blackVersion)"
-          #echo "::set-output name=pushbranch::$($pushBranch)"
-          git pull
+          $date = python -c "import time;print(time.localtime().tm_mday)"
+          $pushBranch="black-update-$($blackVersion)-$($date)"
           git checkout -b $pushBranch "origin/master"
           black manim
           black tests
@@ -51,7 +50,8 @@ jobs:
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
-          $pushBranch="black-update-$($blackVersion)"
+          $date = python -c "import time;print(time.localtime().tm_mday)"
+          $pushBranch="black-update-$($blackVersion)-$($date)"
           $postContents = @{title="Black on Master - Automation";head="$($pushBranch)";base="master"} | ConvertTo-Json -Compress
           Invoke-WebRequest `
             -Method POST `
