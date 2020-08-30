@@ -31,11 +31,14 @@ jobs:
       - name: Print Black Version if Failed
         if: ${{ failure() }}
         run: |
-          pip show black
-          git checkout -b black-update master
+          $blackVersion = pip freeze | Select-String -Pattern "black"
+          git checkout -b "black-update-$($blackVersion)" "master"
           black manim
           black tests
           black example_scenes
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git commit -m "Running Black ON Master"
+          git add .
           git push -u black-update
-          gh pr create --title "Black on Master - Automation" --body "The current black version is $(pip show black)"  -B "master" --repo "naveen521kk/manim"
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)"  -B "master"
