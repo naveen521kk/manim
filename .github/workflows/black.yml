@@ -21,7 +21,7 @@ jobs:
       - name: Black
         run: black --check manim tests example_scenes
       - name: Print Black Version if Failed
-        if: ${{ failed() }}
+        if: ${{ failure() }}
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
