@@ -33,12 +33,7 @@ jobs:
           $pushBranch="black-update-$($blackVersion)"
           echo "::set-output name=pushbranch::$($pushBranch)"
           git pull
-          try{
-          git checkout -b $pushBranch "origin/master"} catch {
-          git branch -d $pushBranch
-          git push origin --delete $pushBranch
           git checkout -b $pushBranch "origin/master"
-          }
           black manim
           black tests
           black example_scenes
@@ -46,7 +41,7 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Running Black ON Master"
-          git push -u origin  "black-update-$($blackVersion)"
+          git push -u -f origin  "black-update-$($blackVersion)"
       - name: Make a PR
         if: failure()
         env:
@@ -56,9 +51,10 @@ jobs:
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $pushBranch="black-update-$($blackVersion)"
+          $postContents = @{title="Black on Master - Automation";head="$($pushBranch)";base:"master"} | ConvertTo-Json -Compress
           Invoke-WebRequest `
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}  `
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
-            -Body '{"title":"Black on Master - Automation","head":"$($pushBranch)","base":"master"}'
+            -Body "$($postContents)"
           #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
