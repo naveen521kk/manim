@@ -21,28 +21,28 @@ jobs:
 
       - name: Install black
         run: pip install black
+
       - name: Black
-        run: black --check manim tests example_scenes
+        run: black manim tests example_scenes
+      - name: Check for modified files
+        shell: bash
+        id: git-check
+        run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
       - name: Print Black Version if Failed
-        continue-on-error: true
-        if: ${{ failure() }}
-        id: black-check
+        if: steps.git-check.outputs.modified == 'true'
         run: |
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
-          $pushBranch="black-update-$($blackVersion)-$($date)"
+          $pushBranch="black-$($blackVersion)-$($date)"
           git checkout -b $pushBranch "origin/master"
-          black manim
-          black tests
-          black example_scenes
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add .
-          git commit -m "Running Black ON Master"
+          git remote set-url up https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "Running Black ON Master"
           echo "pushing origin"
-          git push origin "$($pushBranch)" --force
+          git push up "$($pushBranch)"
       - name: Make a PR
         if: failure()
         env:
@@ -52,7 +52,7 @@ jobs:
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
-          $pushBranch="black-update-$($blackVersion)-$($date)"
+          $pushBranch="black-$($blackVersion)-$($date)"
           echo "$pushBranch"
           $postContents = @{title="Black on Master - Automation";head="$($pushBranch)";base="master"} | ConvertTo-Json -Compress
           echo "$postContents"
@@ -61,4 +61,4 @@ jobs:
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
             -Body "$($postContents)"
-          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
+          #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
