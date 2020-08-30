@@ -45,9 +45,11 @@ jobs:
         if: failure()
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
-          headbranch: ${{ steps.black-check.outputs.pushbranch }} 
         run: |
           $env:GITHUB_TOKEN = $env:access_token
+          $blackVer = black --version
+          $blackVersion = python -c "print('$($blackVer)'.split()[2])"
+          $pushBranch="black-update-$($blackVersion)"
           Invoke-WebRequest `
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}  `
