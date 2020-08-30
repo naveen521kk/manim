@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -22,13 +25,12 @@ jobs:
         run: black --check manim tests example_scenes
       - name: Print Black Version if Failed
         if: ${{ failure() }}
-        env:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
+        id: black-check
         run: |
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "'$($blackVer)'.split()[2]"
-          git checkout -b "black-update-$($blackVersion)" "origin/master"
+          #git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
           black tests
           black example_scenes
@@ -36,5 +38,26 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Running Black ON Master"
+          $pushBranch="black-update-$($blackVersion)"
           git push -u origin  "black-update-$($blackVersion)"
-          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
+          echo "::set-output name=pushbranch::$(pushBranch)"
+      - name: Push changes
+        if: failure()
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.black-check.outputs.pushbranch }}
+      - name: Make a PR
+        if: failure()
+        env:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+          headbranch: ${{ steps.black-check.outputs.pushbranch }} 
+        run: |
+          $env:GITHUB_TOKEN = $env:access_token
+          Invoke-WebRequest `
+            -Method POST `
+            -Headers @{ "Accept" = "application/vnd.github.v3+json"}  `
+            -Authentication "$($GITHUB_TOKEN)" `
+            -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
+            -Body '{"title":"Black on Master - Automation","head":"$env:headbranch","base":"master"}'
+          #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
