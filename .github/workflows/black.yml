@@ -1,11 +1,12 @@
 name: CI
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 9 * * *"
 
 jobs:
   format:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -36,4 +37,5 @@ jobs:
           black tests
           black example_scenes
           git commit -m "Running Black ON Master"
-          git push
+          git push -u black-update
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $(pip show black)"  -B "master" --repo "naveen521kk/manim"
