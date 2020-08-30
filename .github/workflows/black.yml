@@ -54,5 +54,5 @@ jobs:
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}  `
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
-            -Body '{"title":"Black on Master - Automation","head":"$env:headbranch","base":"master"}'
+            -Body '{"title":"Black on Master - Automation","head":"naveen521kk:$env:headbranch","base":"master"}'
           #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
