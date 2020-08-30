@@ -1,0 +1,41 @@
+name: black
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "10 9 * * *"
+
+jobs:
+  format:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install black
+        run: pip install black
+
+      - name: Check manim formatting
+        run: black --check --diff manim
+
+      - name: Check tests formatting
+        run: black --check --diff tests
+
+      - name: Check examples formatting
+        run: black --check --diff example_scenes
+        
+      - name: Print Black Version if Failed
+        if: ${{ failure() }}
+        run: |
+          pip show black
+          git checkout -b black-update master
+          black manim
+          black tests
+          black example_scenes
+          git commit -m "Running Black ON Master"
+          git push -u black-update
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $(pip show black)"  -B "master" --repo "naveen521kk/manim"
