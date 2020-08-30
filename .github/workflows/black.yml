@@ -18,19 +18,15 @@ jobs:
 
       - name: Install black
         run: pip install black
-
-      - name: Check manim formatting
-        run: black --check --diff manim
-
-      - name: Check tests formatting
-        run: black --check --diff tests
-
-      - name: Check examples formatting
-        run: black --check --diff example_scenes
         
       - name: Print Black Version if Failed
         if: ${{ failure() }}
         run: |
+          try {
+          black --check --diff manim
+          black --check --diff tests
+          black --check --diff example_scenes}
+          catch {
           $blackVersion = pip freeze | Select-String -Pattern "black"
           git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
@@ -40,5 +36,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Running Black ON Master"
-          git push -u black-update
-          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)"  -B "master"
+          git push -u "black-update-$($blackVersion)"
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)"}
