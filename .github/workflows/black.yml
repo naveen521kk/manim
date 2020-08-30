@@ -20,6 +20,7 @@ jobs:
         run: pip install black
         
       - name: Print Black Version if Failed
+        continue-on-error: true
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
