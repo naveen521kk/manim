@@ -41,7 +41,7 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Running Black ON Master"
-          git push -u -f origin  "black-update-$($blackVersion)"
+          git push -u origin  "black-update-$($blackVersion)" --force
       - name: Make a PR
         if: failure()
         env:
