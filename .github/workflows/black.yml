@@ -30,7 +30,8 @@ jobs:
           $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
-          echo "::set-output name=pushbranch::$(pushBranch)"
+          $pushBranch="black-update-$($blackVersion)"
+          echo "::set-output name=pushbranch::$($pushBranch)"
           #git checkout -b "black-update-$($blackVersion)" "origin/master"
           black manim
           black tests
@@ -39,15 +40,9 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Running Black ON Master"
-          $pushBranch="black-update-$($blackVersion)"
           git push -u origin  "black-update-$($blackVersion)"
           
-      - name: Push changes
-        if: failure()
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.black-check.outputs.pushbranch }}
+
       - name: Make a PR
         if: failure()
         env:
