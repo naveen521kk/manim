@@ -18,15 +18,13 @@ jobs:
 
       - name: Install black
         run: pip install black
-        
+      - name: Black
+        run: black --check manim tests example_scenes
       - name: Print Black Version if Failed
-        continue-on-error: true
+        if: ${{ failed() }}
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          try {
-          black --check manim tests example_scenes}
-          catch {
           $env:GITHUB_TOKEN = $env:access_token
           $blackVersion = pip freeze | Select-String -Pattern "black"
           git checkout -b "black-update-$($blackVersion)" "origin/master"
@@ -38,4 +36,4 @@ jobs:
           git add .
           git commit -m "Running Black ON Master"
           git push -u "black-update-$($blackVersion)"
-          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)"}
+          gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)"
