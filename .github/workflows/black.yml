@@ -38,9 +38,11 @@ jobs:
           $pushBranch="black-$($blackVersion)-$($date)"
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git remote set-url up https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          $remote_repo="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git commit -am "Running Black ON Master"
           echo "pushing origin"
+          git push "$($remote_repo)" HEAD:"$($pushBranch)" --follow-tags -f
+          
           git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
