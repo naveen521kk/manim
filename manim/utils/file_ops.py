@@ -1,3 +1,12 @@
+__all__ = [
+    "add_extension_if_not_present",
+    "guarantee_existence",
+    "seek_full_path_from_defaults",
+    "modify_atime",
+    "open_file",
+]
+
+
 import os
 import subprocess as sp
 import platform
@@ -32,27 +41,29 @@ def seek_full_path_from_defaults(file_name, default_dir, extensions):
 
 
 def modify_atime(file_path):
-    """Will manually change the accessed time (called `atime`) of the file, as on a lot of OS the accessed time refresh is disabled by default. 
+    """Will manually change the accessed time (called `atime`) of the file, as on a lot of OS the accessed time refresh is disabled by default.
 
     Parameters
     ----------
     file_path : :class:`str`
-        The path of the file. 
+        The path of the file.
     """
     os.utime(file_path, times=(time.time(), os.path.getmtime(file_path)))
 
 
-def open_file(file_path):
+def open_file(file_path, in_browser=False):
     current_os = platform.system()
     if current_os == "Windows":
-        os.startfile(file_path)
+        os.startfile(file_path if not in_browser else os.path.dirname(file_path))
     else:
         if current_os == "Linux":
             commands = ["xdg-open"]
+            file_path = file_path if not in_browser else os.path.dirname(file_path)
         elif current_os.startswith("CYGWIN"):
             commands = ["cygstart"]
+            file_path = file_path if not in_browser else os.path.dirname(file_path)
         elif current_os == "Darwin":
-            commands = ["open"]
+            commands = ["open"] if not in_browser else ["open", "-R"]
         else:
             raise OSError("Unable to identify your operating system...")
         commands.append(file_path)
