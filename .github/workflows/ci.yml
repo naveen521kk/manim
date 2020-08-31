@@ -10,7 +10,7 @@ on:
 
 jobs:
   format:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -24,8 +24,8 @@ jobs:
         run: |
           pip install wheel
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-          #$env:PATH="$($env:USERPROFILE)/.poetry/bin;$($env:PATH)"
-          echo "::set-env name=PATH::$($env:PATH)"
+          echo "::add-path::$HOME/.poetry/bin"
+          
       - name: Check manim formatting
         run: poetry install
       - name: Check manim formatting
@@ -64,6 +64,7 @@ jobs:
           sudo apt update
           sudo apt install -y ffmpeg
           sudo apt-get -y install texlive texlive-latex-extra texlive-fonts-extra texlive-latex-recommended texlive-science texlive-fonts-extra tipa
+          echo "::add-path::$HOME/.poetry/bin"
 
       - name: Install system dependencies (MacOS)
         if: runner.os == 'macOS'
@@ -73,7 +74,6 @@ jobs:
           eval "$(/usr/libexec/path_helper -s)"
           sudo tlmgr update --self
           sudo tlmgr install standalone preview doublestroke relsize fundus-calligra wasysym physics dvisvgm.x86_64-darwin dvisvgm rsfs wasy cm-super
-          echo "::set-env name=PATH::$PATH"
           echo "::add-path::$HOME/.poetry/bin"
 
       - name: Install system dependencies (Windows)
