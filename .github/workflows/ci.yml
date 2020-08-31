@@ -94,7 +94,10 @@ jobs:
           echo "::set-env name=Path::$env:Path"
 
       - name: Install manim
-        run: poetry install
+        shell: bash
+        run: |
+          export POETRY_VIRTUALENVS_CREATE= false
+          poetry install
 
       - name: Run tests
         run: |
