@@ -39,6 +39,8 @@ jobs:
 
   test:
     runs-on: ${{ matrix.os }}
+    env:
+       POETRY_VIRTUALENVS_CREATE: false
     strategy:
       fail-fast: false
       matrix:
@@ -76,7 +78,7 @@ jobs:
           sudo tlmgr update --self
           sudo tlmgr install standalone preview doublestroke relsize fundus-calligra wasysym physics dvisvgm.x86_64-darwin dvisvgm rsfs wasy cm-super
           echo "::add-path::$HOME/.poetry/bin"
-
+          echo "::set-env name=PATH::$PATH"
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -96,13 +98,9 @@ jobs:
           
 
       - name: Install manim
-        shell: bash
         run: |
-          export POETRY_VIRTUALENVS_CREATE=false
           poetry install
 
       - name: Run tests
-        shell: bash
         run: |
-          export POETRY_VIRTUALENVS_CREATE=false
           poetry run pytest
