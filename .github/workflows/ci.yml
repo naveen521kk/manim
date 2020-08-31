@@ -87,10 +87,10 @@ jobs:
           echo "Completed Latex Install Sox"
           Invoke-WebRequest https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2-win32.zip -SkipCertificateCheck -UserAgent "pwsh" -O SoX.zip
           7z x "$PWD\SoX.zip" -o"$env:APPDATA\SoX"
-          $env:Path ="$env:APPDATA\SoX\sox-14.4.2;$(env:PATH)"
+          $env:Path ="$env:APPDATA\SoX\sox-14.4.2;$($env:PATH)"
           Invoke-WebRequest https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.3.1-win64-static.zip -O ffmpeg-4.3.1-win64-static.zip
           7z x "$PWD\ffmpeg-4.3.1-win64-static.zip" -o"$env:APPDATA\FFmpeg"
-          $env:Path = "$env:APPDATA\FFmpeg\ffmpeg-4.3.1-win64-static\bin;$(env:PATH)"
+          $env:Path = "$env:APPDATA\FFmpeg\ffmpeg-4.3.1-win64-static\bin;$($env:PATH)"
           echo "::set-env name=Path::$env:Path"
 
       - name: Install manim
