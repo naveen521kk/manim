@@ -52,7 +52,7 @@ jobs:
           pushBranch="black-${blackVersion}-${date}"
           #$remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
           echo "pushing origin"
-          git push origin "$($pushBranch)" --force
+          git push -u origin "${pushBranch}" --force
           #git push "$($remote_repo)" "$($pushBranch)":"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
