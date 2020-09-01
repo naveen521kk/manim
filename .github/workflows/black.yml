@@ -50,11 +50,7 @@ jobs:
           blackVersion=$(python -c "print('${blackVer}'.split()[2])")
           date=$(python -c "import time;print(time.localtime().tm_mday)")
           pushBranch="black-${blackVersion}-${date}"
-          #$remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
-          echo "pushing origin"
           git push -u origin "${pushBranch}" --force
-          #git push "$($remote_repo)" "$($pushBranch)":"$($pushBranch)"
-          #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
@@ -64,12 +60,10 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          echo "$pushBranch"
-          $postContents = @{title="Black on Master - Automation";head="naveen521kk:$($pushBranch)";base="master"} | ConvertTo-Json -Compress
+          $postContents = @{title="Black on Master - Automation";head="naveen521kk:$($pushBranch)";base="master";body="This an automated pull requests."} | ConvertTo-Json -Compress
           echo "$postContents"
           Invoke-WebRequest `
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
             -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
             -Body "$($postContents)"
-          #gh pr create --title "Black on Master - Automation" --body "The current black version is $($blackVersion)" 
