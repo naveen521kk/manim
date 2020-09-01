@@ -31,12 +31,12 @@ jobs:
         if: steps.git-check.outputs.modified == 'true'
         run: |
           blackVer=$(black --version)
-          blackVersion = python -c "print('${blackVer}'.split()[2])"
-          date = python -c "import time;print(time.localtime().tm_mday)"
-          pushBranch="black-$blackVersion-$date"
+          blackVersion=$(python -c "print('${blackVer}'.split()[2])")
+          date=$(python -c "import time;print(time.localtime().tm_mday)")
+          pushBranch="black-${blackVersion}-${date}"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git checkout --force "$pushBranch"
+          git checkout -b --force "$pushBranch"
           git add .
           git commit -m "Running Black ON Master"
       - name: Push branch
@@ -44,14 +44,15 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
           gitrepo: ${{ github.repository }}
         if: steps.git-check.outputs.modified == 'true'
+        shell: bash
         run: |
-          $blackVer = black --version
-          $blackVersion = python -c "print('$($blackVer)'.split()[2])"
-          $date = python -c "import time;print(time.localtime().tm_mday)"
-          $pushBranch="black-$($blackVersion)-$($date)"
-          $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
+          blackVer=$(black --version)
+          blackVersion=$(python -c "print('${blackVer}'.split()[2])")
+          date=$(python -c "import time;print(time.localtime().tm_mday)")
+          pushBranch="black-${blackVersion}-${date}"
+          #$remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
           echo "pushing origin"
-          git push --force "$($pushBranch)"
+          git push origin "$($pushBranch)" --force
           #git push "$($remote_repo)" "$($pushBranch)":"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
