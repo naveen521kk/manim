@@ -41,16 +41,16 @@ jobs:
       - name: Push branch
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
-          git-repo: ${{ github.repository }}
+          gitrepo: ${{ github.repository }}
         if: steps.git-check.outputs.modified == 'true'
         run: |
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:git-repo).git"
+          $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
           echo "pushing origin"
-          git push "$($remote_repo)" HEAD:"$($pushBranch)"
+          git push --force "$($remote_repo)" HEAD:"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
