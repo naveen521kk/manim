@@ -36,6 +36,7 @@ jobs:
           $pushBranch="black-$($blackVersion)-$($date)"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          git checkout --force "$pushBranch"
           git add .
           git commit -m "Running Black ON Master"
       - name: Push branch
@@ -50,7 +51,8 @@ jobs:
           $pushBranch="black-$($blackVersion)-$($date)"
           $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
           echo "pushing origin"
-          git push "$($remote_repo)" HEAD:"$($pushBranch)"
+          git push --force "$($pushBranch)"
+          #git push "$($remote_repo)" "$($pushBranch)":"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
