@@ -2,7 +2,7 @@ name: black
 on:
   workflow_dispatch:
   schedule:
-    - cron: "10 9 * * *"
+    - cron: "0 0 * * *"
 
 jobs:
   format:
@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v2
         with: 
           fetch-depth: 0
+  
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -21,11 +22,15 @@ jobs:
         run: pip install black
 
       - name: Black
-        run: black manim tests example_scenes
+        run: |
+          black manim tests example_scenes
+          
       - name: Check for modified files
         shell: bash
         id: git-check
-        run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
+        run: |
+          echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
+          echo ::set-output name=filechange::$(git ls-files -m)
       - name: Print Black Version if Failed
         shell: bash
         if: steps.git-check.outputs.modified == 'true'
@@ -38,7 +43,7 @@ jobs:
           git config user.email "actions@github.com"
           git checkout -B "$pushBranch"
           git add .
-          git commit -m "Running Black ON Master"
+          git commit -m "Running Black On Master"
       - name: Push branch
         if: steps.git-check.outputs.modified == 'true'
         shell: bash
@@ -49,18 +54,22 @@ jobs:
           pushBranch="black-${blackVersion}-${date}"
           git push -u origin "${pushBranch}" --force
       - name: Make a PR
+        if: steps.git-check.outputs.modified == 'true'
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
+          file_change: ${{ steps.git-check.outputs.filechange }}
         run: |
-          $env:GITHUB_TOKEN = $env:access_token
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          $postContents = @{title="Black on Master - Automation";head="naveen521kk:$($pushBranch)";base="master";body="This an automated pull requests."} | ConvertTo-Json -Compress
+          $postContents = @{title="Automated PR:autoformat with black";
+          head="ManimCommunity:$($pushBranch)";
+          base="master";
+          body="This an automated pull requests. Files Changed are `n $($env:file_change)"} | ConvertTo-Json -Compress
           echo "$postContents"
           Invoke-WebRequest `
             -Method POST `
             -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
-            -Uri https://api.github.com/repos/naveen521kk/manim/pulls `
+            -Uri https://api.github.com/repos/ManimCommunity/manim/pulls `
             -Body "$($postContents)"
