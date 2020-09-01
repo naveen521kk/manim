@@ -63,7 +63,7 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          $postContents = @{title="Automated PR:autoformat with black";
+          $postContents = @{title="Automated PR: Autoformat with black";
           head="ManimCommunity:$($pushBranch)";
           base="master";
           body="This an automated pull requests. Files Changed are `n `n ```````n$($env:file_change)`n``````"
