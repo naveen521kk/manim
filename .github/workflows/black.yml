@@ -50,7 +50,7 @@ jobs:
           $pushBranch="black-$($blackVersion)-$($date)"
           $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:gitrepo).git"
           echo "pushing origin"
-          git push --force "$($remote_repo)" HEAD:"$($pushBranch)"
+          git push "$($remote_repo)" HEAD:"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
