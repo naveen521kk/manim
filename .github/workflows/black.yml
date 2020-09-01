@@ -40,9 +40,6 @@ jobs:
           git add .
           git commit -m "Running Black ON Master"
       - name: Push branch
-        env:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-          gitrepo: ${{ github.repository }}
         if: steps.git-check.outputs.modified == 'true'
         shell: bash
         run: |
