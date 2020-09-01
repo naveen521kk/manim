@@ -10,7 +10,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
-
+        with: 
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -42,9 +43,12 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
           git-repo: ${{ github.repository }}
         if: steps.git-check.outputs.modified == 'true'
-        shell: bash
         run: |
-          export remote_repo="https://${GITHUB_ACTOR}:${access_token}@github.com/${git-repo}.git"
+          $blackVer = black --version
+          $blackVersion = python -c "print('$($blackVer)'.split()[2])"
+          $date = python -c "import time;print(time.localtime().tm_mday)"
+          $pushBranch="black-$($blackVersion)-$($date)"
+          $remote_repo="https://$($env:GITHUB_ACTOR):$($env:access_token)@github.com/$($env:git-repo).git"
           echo "pushing origin"
           git push "$($remote_repo)" HEAD:"$($pushBranch)"
           #git push up "$($pushBranch):$($pushBranch)"
