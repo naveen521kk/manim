@@ -10,9 +10,6 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
-        with:
-          persist-credentials: true
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -36,14 +33,21 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          $remote_repo="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git commit -am "Running Black ON Master"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Running Black ON Master"
+      - name: Push branch
+        env:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+          git-repo: ${{ github.repository }}
+        if: steps.git-check.outputs.modified == 'true'
+        shell: bash
+        run: |
+          export remote_repo="https://${GITHUB_ACTOR}:${access_token}@github.com/${git-repo}.git"
           echo "pushing origin"
-          git push "$($remote_repo)" HEAD:"$($pushBranch)" --follow-tags -f
-          
-          git push up "$($pushBranch):$($pushBranch)"
+          git push "$($remote_repo)" HEAD:"$($pushBranch)"
+          #git push up "$($pushBranch):$($pushBranch)"
       - name: Make a PR
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
