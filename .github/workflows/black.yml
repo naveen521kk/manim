@@ -36,7 +36,7 @@ jobs:
           pushBranch="black-${blackVersion}-${date}"
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git checkout -b --force "$pushBranch"
+          git checkout -B "$pushBranch"
           git add .
           git commit -m "Running Black ON Master"
       - name: Push branch
