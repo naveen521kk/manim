@@ -31,10 +31,9 @@ jobs:
       - name: Get authors name and email
         id: get-name
         run: |
-          echo "$(gc "$env:GITHUB_EVENT_PATH")"
           $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
-          $authorEmail = $payload.head_commit.author.email
-          $authorName = $payload.head_commit.author.name
+          $authorEmail = "$($payload.pull_request.head.user.id)"+'+'+"$(($payload.pull_request.head.user.login).ToLower())"+'@users.noreply.github.com'
+          $authorName = "$payload.pull_request.head.user.login"
           echo "$payload"
           echo ::set-output name=authorName::$($authorName)
           echo ::set-output name=authorEmail::$($authorEmail)
