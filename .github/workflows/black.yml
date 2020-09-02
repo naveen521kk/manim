@@ -65,7 +65,7 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          $filechange=(gc "D:/diffmod.txt").split()) -join "`n"
+          $filechange=(gc "D:/diffmod.txt").split() -join "`n`n"
           $postContents = @{title="Automated PR: Autoformat with black";
           head="naveen521kk:$($pushBranch)";
           base="master";
