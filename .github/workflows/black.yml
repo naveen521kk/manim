@@ -30,7 +30,7 @@ jobs:
         id: git-check
         run: |
           echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
-          echo ::set-output name=filechange::$(git ls-files -m)
+          git ls-files -m>diffmod.txt
 
       - name: Print Black Version if Failed
         shell: bash
@@ -60,17 +60,15 @@ jobs:
         if: steps.git-check.outputs.modified == 'true'
         env:
           access_token: ${{ secrets.GITHUB_TOKEN }}
-          file_change: ${{ steps.git-check.outputs.filechange }}
         run: |
           $blackVer = black --version
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $date = python -c "import time;print(time.localtime().tm_mday)"
           $pushBranch="black-$($blackVersion)-$($date)"
-          $file_change= $env:file_change -join '`n'
           $postContents = @{title="Automated PR: Autoformat with black";
           head="naveen521kk:$($pushBranch)";
           base="master";
-          body="This an automated pull requests. Files Changed are `n `n ```````n$($file_change)`n``````"
+          body="This an automated pull requests. Files Changed are `n `n ```````n$(gc diffmod.txt)`n``````"
           } | ConvertTo-Json -Compress
           echo "$postContents"
           Invoke-WebRequest `
