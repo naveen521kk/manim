@@ -34,6 +34,7 @@ jobs:
           $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
           $authorEmail = $payload.head_commit.author.email
           $authorName = $payload.head_commit.author.name
+          echo "$payload"
           echo ::set-output name=authorName::$($authorName)
           echo ::set-output name=authorEmail::$($authorEmail)
       - name: Commit the changes if any
