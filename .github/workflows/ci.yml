@@ -36,7 +36,6 @@ jobs:
           $authorName = $payload.head_commit.author.name
           echo ::set-output name=authorName::$($authorName)
           echo ::set-output name=authorEmail::$($authorEmail)
-
       - name: Commit the changes if any
         shell: bash
         if: steps.git-check.outputs.modified == 'true'
@@ -46,14 +45,13 @@ jobs:
         run: |
           blackVer=$(black --version)
           blackVersion=$(python -c "print('${blackVer}'.split()[2])")
-          pushBranch="black-${blackVersion}-${$authorName}"
-          git config user.name "${$authorName}"
-          git config user.email "${$authorEmail}"
+          pushBranch="black-${blackVersion}-${authorName}"
+          git config user.name "${authorName}"
+          git config user.email "${authorEmail}"
           git checkout -B "$pushBranch"
           git add .
           git commit -m "Running Black On Master"
           git push -u origin "${pushBranch}" --force
-
       - name: Make a PR
         if: steps.git-check.outputs.modified == 'true'
         env:
@@ -82,7 +80,6 @@ jobs:
           $blackVersion = python -c "print('$($blackVer)'.split()[2])"
           $pushBranch="black-$($blackVersion)-$($env:authorName)"
           git push -d origin "$pushBranch"
-
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -105,7 +102,6 @@ jobs:
         run: |
            echo "::set-output name=dir::$(pip cache dir)"
            echo "::set-output name=date::$(/bin/date -u "+%m%Y")"
-
       - name: pip cache
         uses: actions/cache@v2
         with:
@@ -118,7 +114,6 @@ jobs:
           sudo apt update
           sudo apt install -y ffmpeg
           sudo apt-get -y install texlive texlive-latex-extra texlive-fonts-extra texlive-latex-recommended texlive-science texlive-fonts-extra tipa
-
       - name: Install system dependencies (MacOS)
         if: runner.os == 'macOS'
         run: |
@@ -128,7 +123,6 @@ jobs:
           sudo tlmgr update --self
           sudo tlmgr install standalone preview doublestroke relsize fundus-calligra wasysym physics dvisvgm.x86_64-darwin dvisvgm rsfs wasy cm-super
           echo "::set-env name=PATH::$PATH"
-
       - name: Cache Windows
         id: cache-windows
         if: runner.os == 'Windows'
@@ -158,7 +152,6 @@ jobs:
           Invoke-WebRequest https://ffmpeg.zeranoe.com/builds/win64/static/$($ffmpegVersion).zip -O "$($env:TMP)\$($ffmpegVersion).zip"
           7z x "$($env:TMP)\$($ffmpegVersion).zip" -o"$($PWD)\ManimCache"
           Move-Item "ManimCache\ffmpeg-*" "ManimCache\FFmpeg"
-
       - name: Add Windows dependecies to path
         if: runner.os == 'Windows'
         run: |
@@ -166,7 +159,6 @@ jobs:
           $env:Path += ";" + "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32"
           $env:Path += ";" + "$($PWD)\ManimCache\SoX"
           echo "::set-env name=Path::$env:Path"
-
       - name: Install Pycairo (Non-Windows)
         if: runner.os == 'macOS' || runner.os == 'Linux'
         run: pip install pycairo
@@ -179,7 +171,6 @@ jobs:
         run: |
           pip install wheel
           pip install . pytest
-
       - name: Run tests
         run: pytest
 
