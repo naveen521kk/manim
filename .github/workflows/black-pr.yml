@@ -1,0 +1,38 @@
+name: black-check
+on:
+  pull_request:
+      branches:
+        - master
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install black
+        run: pip install black
+        
+      - name: Get files
+        id: files-changes-in-pr
+        run: |
+          $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
+          $commitEndpoint=$($payload.pull_request._links.commits)
+          $commits = Invoke-WebRequest -Uri "$commitEndpoint" | ConvertFrom-Json
+          $startCommitSha = $commits[0].sha
+          $endCommitSha = $commits[$commits.count - 1].sha
+          bash -c "git diff --name-only $($startCommitSha) $($endCommitSha)>/d/changes.txt"
+          
+      - name: Check file formatting
+        run: |
+          foreach ($c in (gc "D:/changes.txt").split()){
+            if ($c.endswith(".py")){
+              black "$c"
+            }
+          }
