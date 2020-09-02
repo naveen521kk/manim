@@ -33,7 +33,7 @@ jobs:
         run: |
           $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
           $authorEmail = "$($payload.pull_request.head.user.id)"+'+'+"$(($payload.pull_request.head.user.login).ToLower())"+'@users.noreply.github.com'
-          $authorName = "$payload.pull_request.head.user.login"
+          $authorName = "$($payload.pull_request.head.user.login)"
           echo "$payload"
           echo ::set-output name=authorName::$($authorName)
           echo ::set-output name=authorEmail::$($authorEmail)
