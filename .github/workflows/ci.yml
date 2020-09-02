@@ -47,6 +47,10 @@ jobs:
           blackVer=$(black --version)
           blackVersion=$(python -c "print('${blackVer}'.split()[2])")
           pushBranch="black-${blackVersion}-${authorName}"
+          echo "${authorName}"
+          echo "${authorEmail}"
+          echo ${authorEmail}
+          echo ${authorName}
           git config user.name "${authorName}"
           git config user.email "${authorEmail}"
           git checkout -B "$pushBranch"
