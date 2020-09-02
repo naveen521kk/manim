@@ -46,9 +46,9 @@ jobs:
         run: |
           blackVer=$(black --version)
           blackVersion=$(python -c "print('${blackVer}'.split()[2])")
-          pushBranch="black-${blackVersion}-${$authorName}"
-          git config user.name "${$authorName}"
-          git config user.email "${$authorEmail}"
+          pushBranch="black-${blackVersion}-${authorName}"
+          git config user.name "${authorName}"
+          git config user.email "${authorEmail}"
           git checkout -B "$pushBranch"
           git add .
           git commit -m "Running Black On Master"
