@@ -30,9 +30,20 @@ jobs:
           git ls-files -m>/d/diffmod.txt
       - name: Get authors name and email
         id: get-name
+        env:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
-          $authorEmail = "$($payload.pull_request.head.user.id)"+'+'+"$(($payload.pull_request.head.user.login).ToLower())"+'@users.noreply.github.com'
+          $authorName = "$($payload.pull_request.head.user.login)"
+          $con=Invoke-WebRequest `
+            -Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
+            -Uri "https://api.github.com/users/$($authorName)"
+          $res=ConvertFrom-Json $con.Content
+          if ($res.email -eq $null -or $res.email -eq ""){
+            $authorEmail = "$($payload.pull_request.head.user.id)"+'+'+"$(($payload.pull_request.head.user.login).ToLower())"+'@users.noreply.github.com'
+          }else{
+            $authorEmail = $res.email
+          }
           $authorName = "$($payload.pull_request.head.user.login)"
           echo "$payload"
           echo "::set-output name=authorname::$($authorName)"
