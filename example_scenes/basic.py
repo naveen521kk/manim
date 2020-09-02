@@ -17,15 +17,15 @@ from manim import *
 
 class OpeningManimExample(Scene):
     def construct(self):
-        title = TextMobject("This is some \\LaTeX")
-        basel = TexMobject("\\sum_{n=1}^\\infty " "\\frac{1}{n^2} = \\frac{\\pi^2}{6}")
+        title = Tex("This is some \\LaTeX")
+        basel = MathTex("\\sum_{n=1}^\\infty " "\\frac{1}{n^2} = \\frac{\\pi^2}{6}")
         VGroup(title, basel).arrange(DOWN)
         self.play(
             Write(title), FadeInFrom(basel, UP),
         )
         self.wait()
 
-        transform_title = TextMobject("That was a transform")
+        transform_title = Tex("That was a transform")
         transform_title.to_corner(UP + LEFT)
         self.play(
             Transform(title, transform_title),
@@ -34,7 +34,7 @@ class OpeningManimExample(Scene):
         self.wait()
 
         grid = NumberPlane()
-        grid_title = TextMobject("This is a grid")
+        grid_title = Tex("This is a grid")
         grid_title.scale(1.5)
         grid_title.move_to(transform_title)
 
@@ -46,7 +46,7 @@ class OpeningManimExample(Scene):
         )
         self.wait()
 
-        grid_transform_title = TextMobject(
+        grid_transform_title = Tex(
             "That was a non-linear function \\\\" "applied to the grid"
         )
         grid_transform_title.move_to(grid_title, UL)
@@ -87,12 +87,8 @@ class WarpSquare(Scene):
 
 class WriteStuff(Scene):
     def construct(self):
-        example_text = TextMobject(
-            "This is a some text", tex_to_color_map={"text": YELLOW}
-        )
-        example_tex = TexMobject(
-            "\\sum_{k=1}^\\infty {1 \\over k^2} = {\\pi^2 \\over 6}",
-        )
+        example_text = Tex("This is a some text", tex_to_color_map={"text": YELLOW})
+        example_tex = MathTex("\\sum_{k=1}^\\infty {1 \\over k^2} = {\\pi^2 \\over 6}",)
         group = VGroup(example_text, example_tex)
         group.arrange(DOWN)
         group.set_width(config["frame_width"] - 2 * LARGE_BUFF)
@@ -118,23 +114,24 @@ class UpdatersExample(Scene):
         self.wait()
 
 
-class VDictTest(Scene):
+class VDictExample(Scene):
     def construct(self):
         square = Square().set_color(RED)
         circle = Circle().set_color(YELLOW).next_to(square, UP)
 
         # create dict from list of tuples each having key-mobject pair
         pairs = [("s", square), ("c", circle)]
-        my_dict = VDict(*pairs, show_keys=True)
+        my_dict = VDict(pairs, show_keys=True)
 
         # display it just like a VGroup
         self.play(ShowCreation(my_dict))
         self.wait()
 
-        text = TextMobject("Some text").set_color(GREEN).next_to(square, DOWN)
+        text = Tex("Some text").set_color(GREEN).next_to(square, DOWN)
 
-        # add like a VGroup
-        my_dict.add(("t", text))
+        # add a key-value pair by wrapping it in a single-element list of tuple
+        # after attrs branch is merged, it will be easier like `.add(t=text)`
+        my_dict.add([("t", text)])
         self.wait()
 
         rect = Rectangle().next_to(text, DOWN)
@@ -147,10 +144,10 @@ class VDictTest(Scene):
         self.wait()
 
         # also supports python dict styled reassignment
-        my_dict["t"] = TextMobject("Some other text").set_color(BLUE)
+        my_dict["t"] = Tex("Some other text").set_color(BLUE)
         self.wait()
 
-        # remove submojects by key
+        # remove submoject by key
         my_dict.remove("t")
         self.wait()
 
@@ -163,10 +160,22 @@ class VDictTest(Scene):
         self.play(FadeOutAndShift(my_dict["r"], DOWN))
         self.wait()
 
-        # iterate through all submobjects currently associated with my_dict
-        for submob in my_dict.get_all_submobjects():
-            self.play(ShowCreation(submob))
-            self.wait()
+        # you can also make a VDict from an existing dict of mobjects
+        plain_dict = {
+            1: Integer(1).shift(DOWN),
+            2: Integer(2).shift(2 * DOWN),
+            3: Integer(3).shift(3 * DOWN),
+        }
+
+        vdict_from_plain_dict = VDict(plain_dict)
+        vdict_from_plain_dict.shift(1.5 * (UP + LEFT))
+        self.play(ShowCreation(vdict_from_plain_dict))
+
+        # you can even use zip
+        vdict_using_zip = VDict(zip(["s", "c", "r"], [Square(), Circle(), Rectangle()]))
+        vdict_using_zip.shift(1.5 * RIGHT)
+        self.play(ShowCreation(vdict_using_zip))
+        self.wait()
 
 
 # See old_projects folder for many, many more
