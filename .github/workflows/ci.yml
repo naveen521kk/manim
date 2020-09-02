@@ -1,8 +1,5 @@
 name: CI
 on:
-  push:
-      branches:
-        - master
   pull_request:
       branches:
         - master
@@ -21,15 +18,25 @@ jobs:
 
       - name: Install black
         run: pip install black
-
-      - name: Check manim formatting
-        run: black --check --diff manim
-
-      - name: Check tests formatting
-        run: black --check --diff tests
-
-      - name: Check examples formatting
-        run: black --check --diff example_scenes
+        
+      - name: Get files
+        id: files-changes-in-pr
+        run: |
+          $payload = (gc "$env:GITHUB_EVENT_PATH") | ConvertFrom-Json
+          $commitEndpoint=$($payload.pull_request._links.commits)
+          #-Headers @{ "Accept" = "application/vnd.github.v3+json"; "Authorization"= "token $($env:access_token)"}`
+          $commits = Invoke-WebRequest -Uri "$commitEndpoint" | ConvertFrom-Json
+          $startCommitSha = $commits[0].sha
+          $endCommitSha = $commits[$commits.count - 1].sha
+          bash -c "git diff --name-only $($startCommitSha) $($endCommitSha)>/d/changes.txt"
+          
+      - name: Check file formatting
+        run: |
+          foreach ($c in (gc "D:/changes.txt").split()){
+            if ($c.endswith(".py")){
+              black "$c"
+            }
+          }
 
   test:
     runs-on: ${{ matrix.os }}
