@@ -35,14 +35,14 @@ jobs:
           $authorEmail = "$($payload.pull_request.head.user.id)"+'+'+"$(($payload.pull_request.head.user.login).ToLower())"+'@users.noreply.github.com'
           $authorName = "$($payload.pull_request.head.user.login)"
           echo "$payload"
-          echo ::set-output name=authorName::$($authorName)
-          echo ::set-output name=authorEmail::$($authorEmail)
+          echo "::set-output name=authorname::$($authorName)"
+          echo "::set-output name=authoremail::$($authorEmail)"
       - name: Commit the changes if any
         shell: bash
         if: steps.git-check.outputs.modified == 'true'
         env:
-          authorName: ${{ steps.get-name.outputs.authorName }}
-          authorEmail: ${{ steps.get-name.outputs.authorEmail }}
+          authorName: ${{ steps.get-name.outputs.authorname }}
+          authorEmail: ${{ steps.get-name.outputs.authoremail }}
         run: |
           blackVer=$(black --version)
           blackVersion=$(python -c "print('${blackVer}'.split()[2])")
