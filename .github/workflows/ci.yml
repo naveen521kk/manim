@@ -3,6 +3,7 @@ on:
   push:
       branches:
         - master
+        - patch-4
   pull_request:
       branches:
         - master
