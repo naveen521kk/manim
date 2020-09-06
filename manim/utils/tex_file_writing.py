@@ -1,6 +1,7 @@
 import os
 import hashlib
 from pathlib import Path
+import shutil
 
 from .. import file_writer_config, config, logger
 
@@ -39,10 +40,12 @@ def tex_to_dvi(tex_file, use_ctex=False):
     result = Path(result).as_posix()
     tex_file = Path(tex_file).as_posix()
     tex_dir = Path(file_writer_config["tex_dir"]).as_posix()
+    latex=shutil.which('latex')
+    xelatex=shutil.which('xelatex')
     if not os.path.exists(result):
         commands = (
             [
-                "latex",
+                latex,
                 "-interaction=batchmode",
                 "-halt-on-error",
                 '-output-directory="{}"'.format(tex_dir),
@@ -52,7 +55,7 @@ def tex_to_dvi(tex_file, use_ctex=False):
             ]
             if not use_ctex
             else [
-                "xelatex",
+                xelatex,
                 "-no-pdf",
                 "-interaction=batchmode",
                 "-halt-on-error",
@@ -86,9 +89,10 @@ def dvi_to_svg(dvi_file, use_ctex=False, regen_if_exists=False):
     result = dvi_file.replace(".dvi" if not use_ctex else ".xdv", ".svg")
     result = Path(result).as_posix()
     dvi_file = Path(dvi_file).as_posix()
+    dvisvgm=shutil.which("dvisvgm")
     if not os.path.exists(result):
         commands = [
-            "dvisvgm",
+            dvisvgm,
             '"{}"'.format(dvi_file),
             "-n",
             "-v",
