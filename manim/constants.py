@@ -3,7 +3,7 @@ Constant definitions.
 """
 
 import numpy as np
-
+from shutil import which
 
 # Messages
 NOT_SETTING_FONT_MSG = """
@@ -107,7 +107,7 @@ DEGREES = TAU / 360
 """The exchange rate between radians and degrees."""
 
 # ffmpeg stuff
-FFMPEG_BIN = "ffmpeg"
+FFMPEG_BIN = which("ffmpeg")
 
 # gif stuff
 GIF_FILE_EXTENSION = ".gif"
