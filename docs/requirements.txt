@@ -2,3 +2,4 @@ Sphinx==3.1.2
 guzzle-sphinx-theme
 sphinx_rtd_theme
 recommonmark>=0.5.0
+--no-deps git://github.com/ManimCommunity/manim/@master#egg=manim
