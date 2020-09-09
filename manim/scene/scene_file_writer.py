@@ -453,7 +453,7 @@ class SceneFileWriter(object):
             self.temp_partial_movie_file_path,
             self.partial_movie_file_path,
         )
-        logger.debug(
+        logger.info(
             f"Animation {self.scene.num_plays} : Partial movie file written in {self.partial_movie_file_path}"
         )
 

@@ -1,8 +1,6 @@
 name: black
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"
 
 jobs:
   format:
@@ -24,7 +22,6 @@ jobs:
       - name: Black
         run: |
           black manim tests example_scenes
-
       - name: Check for modified files
         shell: bash
         id: git-check
@@ -45,7 +42,6 @@ jobs:
           git checkout -B "$pushBranch"
           git add .
           git commit -m "Running Black On Master"
-
       - name: Push branch
         if: steps.git-check.outputs.modified == 'true'
         shell: bash
@@ -55,7 +51,6 @@ jobs:
           date=$(python -c "import time;print(time.localtime().tm_mday)")
           pushBranch="black-${blackVersion}-${date}"
           git push -u origin "${pushBranch}" --force
-
       - name: Make a PR
         if: steps.git-check.outputs.modified == 'true'
         env:

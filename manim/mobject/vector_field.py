@@ -43,8 +43,6 @@ DEFAULT_SCALAR_FIELD_COLORS = [BLUE_E, GREEN, YELLOW, RED]
 def get_colored_background_image(
     scalar_field_func,
     number_to_rgb_func,
-    pixel_height=config["pixel_height"],
-    pixel_width=config["pixel_width"],
 ):
     ph = config["pixel_height"]
     pw = config["pixel_width"]
@@ -142,10 +140,6 @@ class VectorField(VGroup):
     CONFIG = {
         "delta_x": 0.5,
         "delta_y": 0.5,
-        "x_min": int(np.floor(-config["frame_width"] / 2)),
-        "x_max": int(np.ceil(config["frame_width"] / 2)),
-        "y_min": int(np.floor(-config["frame_height"] / 2)),
-        "y_max": int(np.ceil(config["frame_height"] / 2)),
         "min_magnitude": 0,
         "max_magnitude": 2,
         "colors": DEFAULT_SCALAR_FIELD_COLORS,
@@ -157,6 +151,10 @@ class VectorField(VGroup):
 
     def __init__(self, func, **kwargs):
         VGroup.__init__(self, **kwargs)
+        self.x_min = int(np.floor(-config["frame_width"] / 2))
+        self.x_max = int(np.ceil(config["frame_width"] / 2))
+        self.y_min = int(np.floor(-config["frame_height"] / 2))
+        self.y_max = int(np.ceil(config["frame_height"] / 2))
         self.func = func
         self.rgb_gradient_function = get_rgb_gradient_function(
             self.min_magnitude, self.max_magnitude, self.colors, flip_alphas=False

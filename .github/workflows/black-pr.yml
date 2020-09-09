@@ -12,6 +12,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+
       - name: Checkout the repository
         shell: bash
         run: |
@@ -22,7 +23,7 @@ jobs:
           git checkout pr-${prnum}
       - name: Install black
         run: pip install black
-        
+
       - name: Get files
         id: files-changes-in-pr
         shell: powershell
@@ -45,14 +46,14 @@ jobs:
           content=$(</d/changes.txt)
           while read file
           do
-            if [ $(python -c "print('${file}'[-2:])") == "py" ]
+            if [[ ($(python -c "print('${file}'[-3:])") == ".py") && (-f ${file}) ]]
             then
               black --diff $file
             fi
           done </d/changes.txt
           while read file
           do
-            if [ $(python -c "print('${file}'[-2:])") == "py" ]
+            if [[ ($(python -c "print('${file}'[-3:])") == ".py") && (-f ${file}) ]]
             then
               black $file
             fi
@@ -66,6 +67,14 @@ jobs:
             echo 'Files Are Formatted '
           } else {
             echo 'Files are not Formated.'
+
+      - name: Check File and Report the Files Not formatted
+        shell: powershell
+        run: |
+          if ( $(bash -c "git diff --name-only") -eq "" -or $(bash -c "git diff --name-only") -eq $null ){
+            echo 'All files Changed are formatted Correctly'
+          } else {
+            echo 'These files need formatting.'
             echo "The Filed changed are `n`n $(git ls-files -m)"
             exit 1
           }
