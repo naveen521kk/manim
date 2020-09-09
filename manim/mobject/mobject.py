@@ -1,10 +1,9 @@
-"""
-mobject.py
-----------
+"""Base classes for objects that can be displayed."""
 
-Base classes for all MObjects.
 
-"""
+__all__ = ["Mobject", "Group"]
+
+
 from functools import reduce
 import copy
 import itertools as it
@@ -16,9 +15,9 @@ import sys
 from colour import Color
 import numpy as np
 
+from .. import config
 from ..constants import *
-from ..config import config
-from ..container.container import Container
+from ..container import Container
 from ..utils.color import color_gradient
 from ..utils.color import interpolate_color
 from ..utils.iterables import list_update
@@ -34,8 +33,13 @@ from ..utils.space_ops import rotation_matrix
 
 
 class Mobject(Container):
-    """
-    Mathematical Object
+    """Mathematical Object: base class for objects that can be displayed on screen.
+
+    Attributes
+    ----------
+    submobjects : :class:`list`
+        The contained objects.
+
     """
 
     CONFIG = {
@@ -73,8 +77,60 @@ class Mobject(Container):
         pass
 
     def add(self, *mobjects):
+        """Add mobjects as submobjects.
+
+        The mobjects are added to self.submobjects.
+
+        Parameters
+        ----------
+        mobjects : :class:`Mobject`
+            The mobjects to add.
+
+        Returns
+        -------
+        :class:`Mobject`
+            :code:`self`
+
+        Raises
+        ------
+        :class:`ValueError`
+            When a mobject tries to add itself.
+
+        Notes
+        -----
+        A mobject cannot contain itself, and it cannot contain a submobject
+        more than once.  If the parent mobject is displayed, the newly-added
+        submobjects will also be displayed (i.e. they are automatically added
+        to the parent Scene).
+
+        See Also
+        --------
+        :meth:`~Mobject.remove`
+
+        Examples
+        --------
+        ::
+
+            >>> outer = Mobject()
+            >>> inner = Mobject()
+            >>> outer = outer.add(inner)
+
+        Duplicates are not added again::
+
+            >>> outer = outer.add(inner)
+            >>> len(outer.submobjects)
+            1
+
+        Adding an object to itself raises an error::
+
+            >>> outer.add(outer)
+            Traceback (most recent call last):
+            ...
+            ValueError: Mobject cannot contain self
+
+        """
         if self in mobjects:
-            raise Exception("Mobject cannot contain self")
+            raise ValueError("Mobject cannot contain self")
         self.submobjects = list_update(self.submobjects, mobjects)
         return self
 
@@ -84,6 +140,25 @@ class Mobject(Container):
         return self
 
     def remove(self, *mobjects):
+        """Remove submobjects.
+
+        The mobjects are removed from self.submobjects, if they exist.
+
+        Parameters
+        ----------
+        mobjects : :class:`Mobject`
+            The mobjects to remove.
+
+        Returns
+        -------
+        :class:`Mobject`
+            :code:`self`
+
+        See Also
+        --------
+        :meth:`~Mobject.add`
+
+        """
         for mobject in mobjects:
             if mobject in self.submobjects:
                 self.submobjects.remove(mobject)
@@ -127,23 +202,6 @@ class Mobject(Container):
         )
 
     def copy(self):
-        # TODO, either justify reason for shallow copy, or
-        # remove this redundancy everywhere
-        # return self.deepcopy()
-
-        copy_mobject = copy.copy(self)
-        copy_mobject.points = np.array(self.points)
-        copy_mobject.submobjects = [submob.copy() for submob in self.submobjects]
-        copy_mobject.updaters = list(self.updaters)
-        family = self.get_family()
-        for attr, value in list(self.__dict__.items()):
-            if isinstance(value, Mobject) and value in family and value is not self:
-                setattr(copy_mobject, attr, value.copy())
-            if isinstance(value, np.ndarray):
-                setattr(copy_mobject, attr, np.array(value))
-        return copy_mobject
-
-    def deepcopy(self):
         return copy.deepcopy(self)
 
     def generate_target(self, use_deepcopy=False):
@@ -550,7 +608,8 @@ class Mobject(Container):
             raise Exception("Cannot position endpoints of closed loop")
         target_vect = np.array(end) - np.array(start)
         self.scale(
-            get_norm(target_vect) / get_norm(curr_vect), about_point=curr_start,
+            get_norm(target_vect) / get_norm(curr_vect),
+            about_point=curr_start,
         )
         self.rotate(
             angle_of_vector(target_vect) - angle_of_vector(curr_vect),
@@ -859,7 +918,9 @@ class Mobject(Container):
 
     def match_coord(self, mobject, dim, direction=ORIGIN):
         return self.set_coord(
-            mobject.get_coord(dim, direction), dim=dim, direction=direction,
+            mobject.get_coord(dim, direction),
+            dim=dim,
+            direction=direction,
         )
 
     def match_x(self, mobject, direction=ORIGIN):
@@ -1118,6 +1179,8 @@ class Mobject(Container):
 
 
 class Group(Mobject):
+    """Groups together multiple Mobjects."""
+
     def __init__(self, *mobjects, **kwargs):
         if not all([isinstance(m, Mobject) for m in mobjects]):
             raise Exception("All submobjects must be of type Mobject")

@@ -1,5 +1,8 @@
+__all__ = ["CameraFrame", "MovingCamera"]
+
+
+from .. import config
 from ..camera.camera import Camera
-from ..config import config
 from ..constants import ORIGIN, WHITE
 from ..mobject.frame import ScreenRectangle
 from ..mobject.types.vectorized_mobject import VGroup
@@ -38,7 +41,8 @@ class MovingCamera(Camera):
         if frame is None:
             frame = ScreenRectangle(height=config["frame_height"])
             frame.set_stroke(
-                self.default_frame_stroke_color, self.default_frame_stroke_width,
+                self.default_frame_stroke_color,
+                self.default_frame_stroke_width,
             )
         self.frame = frame
         Camera.__init__(self, **kwargs)

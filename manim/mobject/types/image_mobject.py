@@ -1,3 +1,6 @@
+__all__ = ["AbstractImageMobject", "ImageMobject", "ImageMobjectFromCamera"]
+
+
 import numpy as np
 
 from PIL import Image
@@ -30,14 +33,17 @@ class AbstractImageMobject(Mobject):
 
     def reset_points(self):
         # Corresponding corners of image are fixed to these 3 points
-        self.points = np.array([UP + LEFT, UP + RIGHT, DOWN + LEFT,])
+        self.points = np.array(
+            [
+                UP + LEFT,
+                UP + RIGHT,
+                DOWN + LEFT,
+            ]
+        )
         self.center()
         h, w = self.get_pixel_array().shape[:2]
         self.stretch_to_fit_height(self.height)
         self.stretch_to_fit_width(self.height * w / h)
-
-    def copy(self):
-        return self.deepcopy()
 
 
 class ImageMobject(AbstractImageMobject):

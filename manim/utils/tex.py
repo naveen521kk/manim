@@ -1,3 +1,6 @@
+__all__ = ["TexTemplateFromFile", "TexTemplate"]
+
+
 import os
 from ..utils.config_ops import digest_config
 
@@ -103,7 +106,7 @@ class TexTemplate(TexTemplateFromFile):
             "xcolor",
             "microtype",
         ],
-        "tex_packages": [],
+        "tex_packages": [["inputenc", ["utf8"]], ["fontenc", ["T1"]]],
         "ctex_packages": [["ctex", ["UTF8"]]],
         "common_preamble_text": r"\linespread{1}" "\n",
         "tex_preamble_text": r"\DisableLigatures{encoding = *, family = *}" "\n",

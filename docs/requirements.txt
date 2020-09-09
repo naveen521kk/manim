@@ -1,0 +1,4 @@
+Sphinx==3.1.2
+guzzle-sphinx-theme
+sphinx_rtd_theme
+recommonmark>=0.5.0

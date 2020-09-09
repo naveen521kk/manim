@@ -1,3 +1,6 @@
+__all__ = ["SceneFileWriter"]
+
+
 import numpy as np
 from pydub import AudioSegment
 import shutil
@@ -8,9 +11,8 @@ from time import sleep
 import datetime
 from PIL import Image
 
+from .. import file_writer_config, logger, console
 from ..constants import FFMPEG_BIN, GIF_FILE_EXTENSION
-from ..config import file_writer_config
-from ..logger import logger, console
 from ..utils.config_ops import digest_config
 from ..utils.file_ops import guarantee_existence
 from ..utils.file_ops import add_extension_if_not_present
@@ -54,24 +56,33 @@ class SceneFileWriter(object):
         scene_name = self.get_default_scene_name()
         if file_writer_config["save_last_frame"] or file_writer_config["save_pngs"]:
             if file_writer_config["media_dir"] != "":
-                image_dir = guarantee_existence(
-                    os.path.join(
-                        file_writer_config["media_dir"], "images", module_directory,
+                if not file_writer_config["custom_folders"]:
+                    image_dir = guarantee_existence(
+                        os.path.join(
+                            file_writer_config["images_dir"],
+                            module_directory,
+                        )
                     )
-                )
+                else:
+                    image_dir = guarantee_existence(file_writer_config["images_dir"])
             self.image_file_path = os.path.join(
                 image_dir, add_extension_if_not_present(scene_name, ".png")
             )
 
         if file_writer_config["write_to_movie"]:
             if file_writer_config["video_dir"]:
-                movie_dir = guarantee_existence(
-                    os.path.join(
-                        file_writer_config["video_dir"],
-                        module_directory,
-                        self.get_resolution_directory(),
+                if not file_writer_config["custom_folders"]:
+                    movie_dir = guarantee_existence(
+                        os.path.join(
+                            file_writer_config["video_dir"],
+                            module_directory,
+                            self.get_resolution_directory(),
+                        )
                     )
-                )
+                else:
+                    movie_dir = guarantee_existence(
+                        os.path.join(file_writer_config["video_dir"])
+                    )
             self.movie_file_path = os.path.join(
                 movie_dir,
                 add_extension_if_not_present(
@@ -81,9 +92,23 @@ class SceneFileWriter(object):
             self.gif_file_path = os.path.join(
                 movie_dir, add_extension_if_not_present(scene_name, GIF_FILE_EXTENSION)
             )
-            self.partial_movie_directory = guarantee_existence(
-                os.path.join(movie_dir, "partial_movie_files", scene_name,)
-            )
+            if not file_writer_config["custom_folders"]:
+                self.partial_movie_directory = guarantee_existence(
+                    os.path.join(
+                        movie_dir,
+                        "partial_movie_files",
+                        scene_name,
+                    )
+                )
+            else:
+                self.partial_movie_directory = guarantee_existence(
+                    os.path.join(
+                        file_writer_config["media_dir"],
+                        "temp_files",
+                        "partial_movie_files",
+                        scene_name,
+                    )
+                )
 
     def get_default_module_directory(self):
         """
@@ -232,7 +257,8 @@ class SceneFileWriter(object):
         diff = new_end - curr_end
         if diff > 0:
             segment = segment.append(
-                AudioSegment.silent(int(np.ceil(diff * 1000))), crossfade=0,
+                AudioSegment.silent(int(np.ceil(diff * 1000))),
+                crossfade=0,
             )
         self.audio_segment = segment.overlay(
             new_segment,
@@ -358,7 +384,7 @@ class SceneFileWriter(object):
                 self.clean_cache()
         if file_writer_config["save_last_frame"]:
             self.scene.update_frame(ignore_skipping=True)
-            self.save_final_image(self.scene.get_image())
+            self.save_final_image(self.scene.camera.get_image())
 
     def open_movie_pipe(self):
         """
@@ -376,8 +402,8 @@ class SceneFileWriter(object):
         self.temp_partial_movie_file_path = temp_file_path
 
         fps = self.scene.camera.frame_rate
-        height = self.scene.camera.get_pixel_height()
-        width = self.scene.camera.get_pixel_width()
+        height = self.scene.camera.pixel_height
+        width = self.scene.camera.pixel_width
 
         command = [
             FFMPEG_BIN,
@@ -424,7 +450,8 @@ class SceneFileWriter(object):
         self.writing_process.stdin.close()
         self.writing_process.wait()
         shutil.move(
-            self.temp_partial_movie_file_path, self.partial_movie_file_path,
+            self.temp_partial_movie_file_path,
+            self.partial_movie_file_path,
         )
         logger.debug(
             f"Animation {self.scene.num_plays} : Partial movie file written in {self.partial_movie_file_path}"
@@ -497,11 +524,12 @@ class SceneFileWriter(object):
             file_writer_config["ffmpeg_loglevel"],
         ]
 
-        if self.write_to_movie:
+        if self.write_to_movie and not self.save_as_gif:
             commands += ["-c", "copy", movie_file_path]
 
         if self.save_as_gif:
             commands += [self.gif_file_path]
+
         if not self.includes_sound:
             commands.insert(-1, "-an")
 
@@ -515,7 +543,8 @@ class SceneFileWriter(object):
             # Makes sure sound file length will match video file
             self.add_audio_segment(AudioSegment.silent(0))
             self.audio_segment.export(
-                sound_file_path, bitrate="312k",
+                sound_file_path,
+                bitrate="312k",
             )
             temp_file_path = movie_file_path.replace(".", "_temp.")
             commands = [
@@ -546,7 +575,9 @@ class SceneFileWriter(object):
             shutil.move(temp_file_path, movie_file_path)
             os.remove(sound_file_path)
 
-        self.print_file_ready_message(movie_file_path)
+        self.print_file_ready_message(
+            self.gif_file_path if self.save_as_gif else movie_file_path
+        )
         if file_writer_config["write_to_movie"]:
             for file_path in partial_movie_files:
                 # We have to modify the accessed time so if we have to clean the cache we remove the one used the longest.

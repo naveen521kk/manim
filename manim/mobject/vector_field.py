@@ -1,12 +1,25 @@
+__all__ = [
+    "VectorField",
+    "StreamLines",
+    "ShowPassingFlashWithThinningStrokeWidth",
+    "AnimatedStreamLines",
+    "get_colored_background_image",
+    "get_rgb_gradient_function",
+    "get_color_field_image_file",
+    "move_along_vector_field",
+    "move_submobjects_along_vector_field",
+    "move_points_along_vector_field",
+]
+
+
 import numpy as np
 import os
 import itertools as it
 from PIL import Image
 import random
 
+from .. import config, logger
 from ..constants import *
-from ..config import config
-from ..logger import logger
 from ..animation.composition import AnimationGroup
 from ..animation.indication import ShowPassingFlash
 from ..mobject.geometry import Vector
@@ -53,7 +66,10 @@ def get_colored_background_image(
 
 
 def get_rgb_gradient_function(
-    min_value=0, max_value=1, colors=[BLUE, RED], flip_alphas=True,  # Why?
+    min_value=0,
+    max_value=1,
+    colors=[BLUE, RED],
+    flip_alphas=True,  # Why?
 ):
     rgbs = np.array(list(map(color_to_rgb, colors)))
 
@@ -224,7 +240,9 @@ class StreamLines(VGroup):
 
         if self.color_by_arc_length:
             len_to_rgb = get_rgb_gradient_function(
-                self.min_arc_length, self.max_arc_length, colors=self.colors,
+                self.min_arc_length,
+                self.max_arc_length,
+                colors=self.colors,
             )
             for line in self:
                 arc_length = line.get_arc_length()
@@ -294,7 +312,11 @@ class AnimatedStreamLines(VGroup):
     CONFIG = {
         "lag_range": 4,
         "line_anim_class": ShowPassingFlash,
-        "line_anim_config": {"run_time": 4, "rate_func": linear, "time_width": 0.3,},
+        "line_anim_config": {
+            "run_time": 4,
+            "rate_func": linear,
+            "time_width": 0.3,
+        },
     }
 
     def __init__(self, stream_lines, **kwargs):

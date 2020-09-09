@@ -1,3 +1,6 @@
+__all__ = ["PMobject", "Mobject1D", "Mobject2D", "PGroup", "PointCloudDot", "Point"]
+
+
 from ...constants import *
 from ...mobject.mobject import Mobject
 from ...utils.bezier import interpolate
@@ -158,7 +161,9 @@ class PMobject(Mobject):
         self.rgbas = interpolate(mobject1.rgbas, mobject2.rgbas, alpha)
         self.set_stroke_width(
             interpolate(
-                mobject1.get_stroke_width(), mobject2.get_stroke_width(), alpha,
+                mobject1.get_stroke_width(),
+                mobject2.get_stroke_width(),
+                alpha,
             )
         )
         return self
