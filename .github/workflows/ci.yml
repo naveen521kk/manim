@@ -99,7 +99,7 @@ jobs:
 
       - name: Install Pycairo (Windows)
         if: runner.os == 'Windows'
-        run: python ./scripts/pycairoinstall.py
+        run: pip install -i https://test.pypi.org/simple/ pycairo
 
       - name: Install manim
         run: |
