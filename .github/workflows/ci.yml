@@ -3,6 +3,7 @@ on:
   push:
       branches:
         - master
+        - test-pango
   pull_request:
       branches:
         - master
@@ -100,6 +101,7 @@ jobs:
           Invoke-WebRequest "https://github.com/ManimCommunity/manim-windows/releases/download/$($pangoVersion)/pango-windows-binaires-x64.zip" -O "$($env:TMP)\Pango.zip"
           mkdir "$($PWD)\ManimCache\Pango"
           7z x "$($env:TMP)\Pango.zip" -o"$($PWD)\ManimCache\Pango"
+          tree ManimCache
 
       - name: Add Windows dependecies to path
         if: runner.os == 'Windows'
@@ -109,6 +111,7 @@ jobs:
           $env:Path += ";" + "$($PWD)\ManimCache\SoX"
           $env:Path += ";" + "$($PWD)\ManimCache\Pango"
           $env:Path = "$env:USERPROFILE\.poetry\bin;$($env:PATH)"
+          dir "$($PWD)\ManimCache\Pango"
           echo "::set-env name=Path::$env:Path"
 
       - name: Install manim
