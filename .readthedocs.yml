@@ -2,6 +2,7 @@ version: 2
 
 python:
    version: 3.7
+   system_packages: true
    install:
       - requirements: docs/rtd-requirements.txt
       - requirements: docs/requirements.txt
