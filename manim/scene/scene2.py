@@ -1,29 +1,3 @@
-"""The interface between scenes and ffmpeg."""
-
-__all__ = ["SceneFileWriter"]
-
-
-import numpy as np
-from pydub import AudioSegment
-import shutil
-import subprocess
-import os
-import av
-import _thread as thread
-from time import sleep
-import datetime
-from PIL import Image
-
-from .. import file_writer_config, logger, console
-from ..constants import FFMPEG_BIN, GIF_FILE_EXTENSION
-from ..utils.config_ops import digest_config
-from ..utils.file_ops import guarantee_existence
-from ..utils.file_ops import add_extension_if_not_present
-from ..utils.file_ops import modify_atime
-from ..utils.sounds import get_full_sound_file_path
-
-
-
 class SceneFileWriter(object):
     """
     SceneFileWriter is the object that actually writes the animations
@@ -47,14 +21,12 @@ class SceneFileWriter(object):
     def __init__(self, renderer, video_quality_config, scene_name, **kwargs):
         digest_config(self, kwargs)
         self.renderer = renderer
-        self.frames_list =[]
         self.video_quality_config = video_quality_config
         self.stream_lock = False
         self.init_output_directories(scene_name)
         self.init_audio()
         self.frame_count = 0
         self.partial_movie_files = []
-        logger.info("Using AV python")
 
     # Output directories and files
     def init_output_directories(self, scene_name):
@@ -346,11 +318,7 @@ class SceneFileWriter(object):
             Pixel array of the frame.
         """
         if file_writer_config["write_to_movie"]:
-            frame = av.VideoFrame.from_ndarray(frame, format='rgba') #what is format doing here?
-            for packet in self.stream.encode(frame):
-                self.container.mux(packet) #this is done just to create partial files. This isn't required usually.
-            #self.writing_process.stdin.write(frame.tostring())
-            self.frames_list.append(frame)
+            self.writing_process.stdin.write(frame.tostring())
         if file_writer_config["save_pngs"]:
             path, extension = os.path.splitext(self.image_file_path)
             Image.fromarray(frame).save(f"{path}{self.frame_count}{extension}")
@@ -370,7 +338,7 @@ class SceneFileWriter(object):
         image.save(file_path)
         self.print_file_ready_message(file_path)
 
-    def idle_stream(self): #should I remove this?
+    def idle_stream(self):
         """
         Doesn't write anything to the FFMPEG frame buffer.
         """
@@ -395,8 +363,8 @@ class SceneFileWriter(object):
         frame in the default image directory.
         """
         if file_writer_config["write_to_movie"]:
-            if hasattr(self, "container"):
-                self.container.close()
+            if hasattr(self, "writing_process"):
+                self.writing_process.terminate()
             self.combine_movie_files()
             if file_writer_config["flush_cache"]:
                 self.flush_cache_directory()
@@ -423,12 +391,12 @@ class SceneFileWriter(object):
         fps = self.video_quality_config["frame_rate"]
         height = self.video_quality_config["pixel_height"]
         width = self.video_quality_config["pixel_width"]
-        """
+
         command = [
             FFMPEG_BIN,
             "-y",  # overwrite output file if it exists
             "-f",
-            "rawvideo", #idk about this
+            "rawvideo",
             "-s",
             "%dx%d" % (width, height),  # size of one frame
             "-pix_fmt",
@@ -458,19 +426,7 @@ class SceneFileWriter(object):
                 "yuv420p",
             ]
         command += [temp_file_path]
-        """
-        self.container = av.open(temp_file_path, mode='w')
-        if file_writer_config["movie_file_extension"] == ".mov":
-            stream = self.container.add_stream('qtrle', rate=fps)
-            stream.pix_fmt = 'rgba'
-        else:
-            stream = self.container.add_stream('libx264', rate=fps)
-            stream.pix_fmt = 'yuv420p'
-        stream.width = width
-        stream.height = height
-        self.stream = stream
-        print(temp_file_path)
-        #self.writing_process = subprocess.Popen(command, stdin=subprocess.PIPE)
+        self.writing_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
     def close_movie_pipe(self):
         """
@@ -478,14 +434,8 @@ class SceneFileWriter(object):
         input buffer, and move the temporary files into their permananant
         locations
         """
-        stream=self.stream
-        container=self.container
-        for packet in stream.encode():
-            container.mux(packet)
-
-        # Close the container or file
-        container.close()
-        
+        self.writing_process.stdin.close()
+        self.writing_process.wait()
         shutil.move(
             self.temp_partial_movie_file_path,
             self.partial_movie_file_path,
@@ -534,14 +484,19 @@ class SceneFileWriter(object):
 
         # Write a file partial_file_list.txt containing all
         # partial movie files. This is used by FFMPEG.
-        frames_list = self.frames_list
-        if frames_list:
-            for frame in frames_list:
-                for packet in self.stream.encode(frame):
-                    self.container.mux(packet)
-        else:
-            logger.warn("No frames Found. Which means there is no SCENES in python")
-        """
+        file_list = os.path.join(
+            self.partial_movie_directory, "partial_movie_file_list.txt"
+        )
+        logger.debug(
+            f"Partial movie files to combine ({len(partial_movie_files)} files): %(p)s",
+            {"p": partial_movie_files[:5]},
+        )
+        with open(file_list, "w") as fp:
+            fp.write("# This file is used internally by FFMPEG.\n")
+            for pf_path in partial_movie_files:
+                if os.name == "nt":
+                    pf_path = pf_path.replace("\\", "/")
+                fp.write("file 'file:{}'\n".format(pf_path))
         movie_file_path = self.get_movie_file_path()
         commands = [
             FFMPEG_BIN,
@@ -567,7 +522,7 @@ class SceneFileWriter(object):
 
         combine_process = subprocess.Popen(commands)
         combine_process.wait()
-        """
+
         if self.includes_sound:
             sound_file_path = movie_file_path.replace(
                 file_writer_config["movie_file_extension"], ".wav"
