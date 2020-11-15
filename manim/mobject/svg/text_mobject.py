@@ -668,7 +668,9 @@ class Text(SVGMobject):
         "tab_width": 4,
     }
 
-    def __init__(self, text: str, **config):  # pylint: disable=redefined-outer-name
+    def __init__(
+        self, text: str **config
+    ):  # pylint: disable=redefined-outer-name
         logger.info(
             "Text now uses Pango for rendering. "
             "In case of problems, the old implementation is available as CairoText."
@@ -891,7 +893,10 @@ class Text(SVGMobject):
         file_name = os.path.join(dir_name, hash_name) + ".svg"
         if os.path.exists(file_name):
             return file_name
-        surface = cairocffi.SVGSurface(file_name, 600, 400)
+        width = START_X + max([len(i) for i in self.text.split("\n")]) * (size)
+        surface = cairocffi.SVGSurface(
+            file_name, width + 50, START_Y + config["pixel_height"]
+        )
         context = cairocffi.Context(surface)
         context.move_to(START_X, START_Y)
         settings = self.text2settings()
@@ -903,7 +908,7 @@ class Text(SVGMobject):
             weight = self.str2weight(setting.weight)
             text = self.text[setting.start : setting.end].replace("\n", " ")
             layout = pangocairocffi.create_layout(context)
-            layout.set_width(pangocffi.units_from_double(600))
+            layout.set_width(pangocffi.units_from_double(width))
             fontdesc = pangocffi.FontDescription()
             fontdesc.set_size(pangocffi.units_from_double(size))
             if family:
