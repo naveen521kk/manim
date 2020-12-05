@@ -1,3 +1,5 @@
+"""A scene suitable for vector spaces."""
+
 __all__ = ["VectorScene", "LinearTransformationScene"]
 
 
@@ -29,6 +31,7 @@ from ..mobject.svg.tex_mobject import Tex
 from ..mobject.types.vectorized_mobject import VGroup
 from ..mobject.types.vectorized_mobject import VMobject
 from ..scene.scene import Scene
+from ..utils.color import GREEN_C, RED_C, BLUE_D, WHITE, YELLOW, GREY, LIGHT_GREY
 from ..utils.rate_functions import rush_from
 from ..utils.rate_functions import rush_into
 from ..utils.space_ops import angle_of_vector
@@ -46,7 +49,9 @@ Z_COLOR = BLUE_D
 # Also, methods I would have thought of as getters, like coords_to_vector, are
 # actually doing a lot of animating.
 class VectorScene(Scene):
-    CONFIG = {"basis_vector_stroke_width": 6}
+    def __init__(self, basis_vector_stroke_width=6, **kwargs):
+        Scene.__init__(self, **kwargs)
+        self.basis_vector_stroke_width = basis_vector_stroke_width
 
     def add_plane(self, animate=False, **kwargs):
         """
@@ -106,7 +111,10 @@ class VectorScene(Scene):
         axes.set_color(WHITE)
         axes.fade(axes_dimness)
         self.add(axes)
-        self.freeze_background()
+
+        self.renderer.update_frame()
+        self.renderer.camera = Camera(self.renderer.get_frame())
+        self.clear()
 
     def get_vector(self, numerical_vector, **kwargs):
         """
@@ -174,20 +182,22 @@ class VectorScene(Scene):
 
         Parameters
         ----------
-        vector : Arrow
+        vector : :class:`.Arrow`
             The arrow representing the vector.
 
         **kwargs
-            Any valid keyword arguments of matrix.vector_coordinate_label
+            Any valid keyword arguments of :meth:`~.matrix.vector_coordinate_label`:
 
-            integer_labels (True) : Whether or not to round the coordinates
-                                    to integers.
-            n_dim (2) : The number of dimensions of the vector.
-            color (WHITE) : The color of the label.
+            integer_labels : :class:`bool`
+                Whether or not to round the coordinates to integers. Default: ``True``.
+            n_dim : :class:`int`
+                The number of dimensions of the vector. Default: ``2``.
+            color
+                The color of the label. Default: ``WHITE``.
 
         Returns
         -------
-        Matrix
+        :class:`.Matrix`
             The column matrix representing the vector.
         """
         coords = vector_coordinate_label(vector, **kwargs)
@@ -393,13 +403,14 @@ class VectorScene(Scene):
             )
         )
         self.play(ShowCreation(x_line))
-        self.play(
+        animations = [
             ApplyFunction(
                 lambda y: self.position_y_coordinate(y, y_line, vector), y_coord
             ),
             FadeOut(array.get_brackets()),
-        )
-        y_coord, brackets = self.get_mobjects_from_last_animation()
+        ]
+        self.play(*animations)
+        y_coord, _ = [anim.mobject for anim in animations]
         self.play(ShowCreation(y_line))
         self.play(ShowCreation(arrow))
         self.wait()
@@ -505,10 +516,11 @@ class LinearTransformationScene(VectorScene):
     especially suitable for showing Linear Transformations.
     """
 
-    CONFIG = {
-        "include_background_plane": True,
-        "include_foreground_plane": True,
-        "background_plane_kwargs": {
+    def __init__(
+        self,
+        include_background_plane=True,
+        include_foreground_plane=True,
+        background_plane_kwargs={
             "color": GREY,
             "axis_config": {
                 "stroke_color": LIGHT_GREY,
@@ -521,23 +533,34 @@ class LinearTransformationScene(VectorScene):
                 "stroke_width": 1,
             },
         },
-        "show_coordinates": False,
-        "show_basis_vectors": True,
-        "basis_vector_stroke_width": 6,
-        "i_hat_color": X_COLOR,
-        "j_hat_color": Y_COLOR,
-        "leave_ghost_vectors": False,
-        "t_matrix": [[3, 0], [1, 2]],
-    }
-
-    def __init__(self, **kwargs):
+        show_coordinates=False,
+        show_basis_vectors=True,
+        basis_vector_stroke_width=6,
+        i_hat_color=X_COLOR,
+        j_hat_color=Y_COLOR,
+        leave_ghost_vectors=False,
+        t_matrix=[[3, 0], [1, 2]],
+        **kwargs
+    ):
         VectorScene.__init__(self, **kwargs)
+
+        self.include_background_plane = include_background_plane
+        self.include_foreground_plane = include_foreground_plane
+        self.background_plane_kwargs = background_plane_kwargs
+        self.show_coordinates = show_coordinates
+        self.show_basis_vectors = show_basis_vectors
+        self.basis_vector_stroke_width = basis_vector_stroke_width
+        self.i_hat_color = i_hat_color
+        self.j_hat_color = j_hat_color
+        self.leave_ghost_vectors = leave_ghost_vectors
+        self.t_matrix = t_matrix
+
         self.foreground_plane_kwargs = {
             "x_max": config["frame_width"] / 2,
             "x_min": -config["frame_width"] / 2,
             "y_max": config["frame_width"] / 2,
             "y_min": -config["frame_width"] / 2,
-            "faded_line_ratio": 0,
+            "faded_line_ratio": 1,
         }
 
     def setup(self):
@@ -863,7 +886,7 @@ class LinearTransformationScene(VectorScene):
             new_matrix[:2, :2] = transposed_matrix
             transposed_matrix = new_matrix
         elif transposed_matrix.shape != (3, 3):
-            raise Exception("Matrix has bad dimensions")
+            raise ValueError("Matrix has bad dimensions")
         return lambda point: np.dot(point, transposed_matrix)
 
     def get_piece_movement(self, pieces):

@@ -1,3 +1,5 @@
+"""Utilities for scene caching."""
+
 import json
 import zlib
 import inspect
@@ -41,9 +43,15 @@ class CustomEncoder(json.JSONEncoder):
                 # NOTE : All module types objects are removed, because otherwise it throws ValueError: Circular reference detected if not. TODO
                 if isinstance(cvardict[i], ModuleType):
                     del cvardict[i]
-            return self._check_iterable(
-                {"code": inspect.getsource(obj), "nonlocals": cvardict}
-            )
+            try:
+                code = inspect.getsource(obj)
+            except OSError:
+                # This happens when rendering videos included in the documentation
+                # within doctests and should be replaced by a solution avoiding
+                # hash collision (due to the same, empty, code strings) at some point.
+                # See https://github.com/ManimCommunity/manim/pull/402.
+                code = ""
+            return self._check_iterable({"code": code, "nonlocals": cvardict})
         elif isinstance(obj, np.ndarray):
             if obj.size > 1000:
                 obj = np.resize(obj, (100, 100))
@@ -52,9 +60,10 @@ class CustomEncoder(json.JSONEncoder):
             return repr(obj)
         elif hasattr(obj, "__dict__"):
             temp = getattr(obj, "__dict__")
-            # MappingProxy is not supported by the Json Encoder
+            # MappingProxy is scene-caching nightmare. It contains all of the object methods and attributes. We skip it as the mechanism will at some point process the object, but instancied
+            # Indeed, there is certainly no case where scene-caching will recieve only a non instancied object, as this is never used in the library or encouraged to be used user-side.
             if isinstance(temp, MappingProxyType):
-                return dict(temp)
+                return "MappingProxy"
             return self._check_iterable(temp)
         elif isinstance(obj, np.uint8):
             return int(obj)
@@ -102,6 +111,11 @@ class CustomEncoder(json.JSONEncoder):
             # We have to make a copy, as we don't want to touch to the original list
             # A deepcopy isn't necessary as it is already recursive.
             lst_copy = copy.copy(lst)
+            if isinstance(lst, tuple):
+                # NOTE: Sometimes a tuple can pass through this function. As a tuple
+                # is immutable, we convert it to a list to be able to modify it.
+                # It's ok as it is a copy.
+                lst_copy = list(lst_copy)
             for i, el in enumerate(lst):
                 if not isinstance(lst, tuple):
                     lst_copy[i] = self._handle_already_processed(
@@ -163,7 +177,7 @@ class CustomEncoder(json.JSONEncoder):
 def get_json(obj):
     """Recursively serialize `object` to JSON using the :class:`CustomEncoder` class.
 
-    Paramaters
+    Parameters
     ----------
     dict_config : :class:`dict`
         The dict to flatten
@@ -237,10 +251,12 @@ def get_hash_from_play_call(
         for json_val in [camera_json, animations_list_json, current_mobjects_list_json]
     ]
     t_end = perf_counter()
-    logger.debug("Hashing done in {:.5f} s.".format(t_end - t_start))
+    logger.debug("Hashing done in %(time)s s.", {"time": str(t_end - t_start)[:8]})
+    hash_complete = f"{hash_camera}_{hash_animations}_{hash_current_mobjects}"
     # This will reset ALREADY_PROCESSED_ID as all the hashing processus is finished.
     ALREADY_PROCESSED_ID = {}
-    return "{}_{}_{}".format(hash_camera, hash_animations, hash_current_mobjects)
+    logger.debug("Hash generated :  %(h)s", {"h": hash_complete})
+    return hash_complete
 
 
 def get_hash_from_wait_call(
@@ -284,16 +300,16 @@ def get_hash_from_wait_call(
         # This will reset ALREADY_PROCESSED_ID as all the hashing processus is finished.
         ALREADY_PROCESSED_ID = {}
         t_end = perf_counter()
-        logger.debug("Hashing done in {:.5f} s.".format(t_end - t_start))
-        return "{}_{}{}_{}".format(
-            hash_camera,
-            str(wait_time).replace(".", "-"),
-            hash_function,
-            hash_current_mobjects,
-        )
+        logger.debug("Hashing done in %(time)s s.", {"time": str(t_end - t_start)[:8]})
+        hash_complete = f"{hash_camera}_{str(wait_time).replace('.', '-')}{hash_function}_{hash_current_mobjects}"
+        logger.debug("Hash generated :  %(h)s", {"h": hash_complete})
+        return hash_complete
     ALREADY_PROCESSED_ID = {}
     t_end = perf_counter()
-    logger.debug("Hashing done in {:.5f} s.".format(t_end - t_start))
-    return "{}_{}_{}".format(
-        hash_camera, str(wait_time).replace(".", "-"), hash_current_mobjects
+    logger.debug("Hashing done in %(time)s s.", {"time": str(t_end - t_start)[:8]})
+    hash_complete = (
+        f"{hash_camera}_{str(wait_time).replace('.', '-')}_{hash_current_mobjects}"
     )
+
+    logger.debug("Hash generated :  %(h)s", {"h": hash_complete})
+    return hash_complete

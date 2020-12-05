@@ -1,3 +1,50 @@
+"""A scene supporting zooming in on a specified section.
+
+
+Examples
+--------
+
+.. manim:: UseZoomedScene
+
+    class UseZoomedScene(ZoomedScene):
+        def construct(self):
+            dot = Dot().set_color(GREEN)
+            self.add(dot)
+            self.wait(1)
+            self.activate_zooming(animate=False)
+            self.wait(1)
+            self.play(dot.shift, LEFT)
+
+.. manim:: ChangingZoomScale
+
+    class ChangingZoomScale(ZoomedScene):
+        def __init__(self, **kwargs):
+            ZoomedScene.__init__(
+                self,
+                zoom_factor=0.3,
+                zoomed_display_height=1,
+                zoomed_display_width=3,
+                image_frame_stroke_width=20,
+                zoomed_camera_config={
+                    "default_frame_stroke_width": 3,
+                },
+                **kwargs
+            )
+
+        def construct(self):
+            dot = Dot().set_color(GREEN)
+            sq = Circle(fill_opacity=1, radius=0.2).next_to(dot, RIGHT)
+            self.add(dot, sq)
+            self.wait(1)
+            self.activate_zooming(animate=False)
+            self.wait(1)
+            self.play(dot.shift, LEFT * 0.3)
+
+            self.play(self.zoomed_camera.frame.scale, 4)
+            self.play(self.zoomed_camera.frame.shift, 0.5 * DOWN)
+
+"""
+
 __all__ = ["ZoomedScene"]
 
 
@@ -20,23 +67,39 @@ class ZoomedScene(MovingCameraScene):
     separately.
     """
 
-    CONFIG = {
-        "camera_class": MultiCamera,
-        "zoomed_display_height": 3,
-        "zoomed_display_width": 3,
-        "zoomed_display_center": None,
-        "zoomed_display_corner": UP + RIGHT,
-        "zoomed_display_corner_buff": DEFAULT_MOBJECT_TO_EDGE_BUFFER,
-        "zoomed_camera_config": {
+    def __init__(
+        self,
+        camera_class=MultiCamera,
+        zoomed_display_height=3,
+        zoomed_display_width=3,
+        zoomed_display_center=None,
+        zoomed_display_corner=UP + RIGHT,
+        zoomed_display_corner_buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER,
+        zoomed_camera_config={
             "default_frame_stroke_width": 2,
             "background_opacity": 1,
         },
-        "zoomed_camera_image_mobject_config": {},
-        "zoomed_camera_frame_starting_position": ORIGIN,
-        "zoom_factor": 0.15,
-        "image_frame_stroke_width": 3,
-        "zoom_activated": False,
-    }
+        zoomed_camera_image_mobject_config={},
+        zoomed_camera_frame_starting_position=ORIGIN,
+        zoom_factor=0.15,
+        image_frame_stroke_width=3,
+        zoom_activated=False,
+        **kwargs
+    ):
+        self.zoomed_display_height = zoomed_display_height
+        self.zoomed_display_width = zoomed_display_width
+        self.zoomed_display_center = zoomed_display_center
+        self.zoomed_display_corner = zoomed_display_corner
+        self.zoomed_display_corner_buff = zoomed_display_corner_buff
+        self.zoomed_camera_config = zoomed_camera_config
+        self.zoomed_camera_image_mobject_config = zoomed_camera_image_mobject_config
+        self.zoomed_camera_frame_starting_position = (
+            zoomed_camera_frame_starting_position
+        )
+        self.zoom_factor = zoom_factor
+        self.image_frame_stroke_width = image_frame_stroke_width
+        self.zoom_activated = zoom_activated
+        MovingCameraScene.__init__(self, camera_class=camera_class, **kwargs)
 
     def setup(self):
         """
@@ -79,7 +142,7 @@ class ZoomedScene(MovingCameraScene):
             of the zoomed camera.
         """
         self.zoom_activated = True
-        self.camera.add_image_mobject_from_camera(self.zoomed_display)
+        self.renderer.camera.add_image_mobject_from_camera(self.zoomed_display)
         if animate:
             self.play(self.get_zoom_in_animation())
             self.play(self.get_zoomed_display_pop_out_animation())
@@ -126,7 +189,7 @@ class ZoomedScene(MovingCameraScene):
             The Animation of the Zoomed Display popping out.
         """
         display = self.zoomed_display
-        display.save_state(use_deepcopy=True)
+        display.save_state()
         display.replace(self.zoomed_camera.frame, stretch=True)
         return ApplyMethod(display.restore)
 

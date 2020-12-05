@@ -1,3 +1,48 @@
+"""A scene for plotting / graphing functions.
+
+Examples
+--------
+
+.. manim:: FunctionPlotWithLabbeledYAxis
+    :save_last_frame:
+
+    class FunctionPlotWithLabbeledYAxis(GraphScene):
+        def __init__(self, **kwargs):
+            GraphScene.__init__(
+                self,
+                y_min=0,
+                y_max=100,
+                y_axis_config={"tick_frequency": 10},
+                y_labeled_nums=np.arange(0, 100, 10),
+                **kwargs
+            )
+
+        def construct(self):
+            self.setup_axes()
+            dot = Dot().move_to(self.coords_to_point(PI / 2, 20))
+            func_graph = self.get_graph(lambda x: 20 * np.sin(x))
+            self.add(dot,func_graph)
+
+
+.. manim:: GaussianFunctionPlot
+    :save_last_frame:
+
+    amp = 5
+    mu = 3
+    sig = 1
+
+    def gaussian(x):
+        return amp * np.exp((-1 / 2 * ((x - mu) / sig) ** 2))
+
+    class GaussianFunctionPlot(GraphScene):
+        def construct(self):
+            self.setup_axes()
+            graph = self.get_graph(gaussian, x_min=-1, x_max=10)
+            graph.set_stroke(width=5)
+            self.add(graph)
+
+"""
+
 __all__ = ["GraphScene"]
 
 
@@ -19,7 +64,7 @@ from ..mobject.types.vectorized_mobject import VGroup
 from ..mobject.types.vectorized_mobject import VectorizedPoint
 from ..scene.scene import Scene
 from ..utils.bezier import interpolate
-from ..utils.color import color_gradient
+from ..utils.color import color_gradient, GREY, BLUE, GREEN, YELLOW, BLACK, WHITE
 from ..utils.color import invert_color
 from ..utils.space_ops import angle_of_vector
 
@@ -30,37 +75,69 @@ from ..utils.space_ops import angle_of_vector
 
 
 class GraphScene(Scene):
-    CONFIG = {
-        "x_min": -1,
-        "x_max": 10,
-        "x_axis_width": 9,
-        "x_leftmost_tick": None,  # Change if different from x_min
-        "x_labeled_nums": None,
-        "x_axis_label": "$x$",
-        "y_min": -1,
-        "y_max": 10,
-        "y_axis_height": 6,
-        "y_bottom_tick": None,  # Change if different from y_min
-        "y_labeled_nums": None,
-        "y_axis_label": "$y$",
-        "axes_color": GREY,
-        "graph_origin": 2.5 * DOWN + 4 * LEFT,
-        "exclude_zero_label": True,
-        "default_graph_colors": [BLUE, GREEN, YELLOW],
-        "default_derivative_color": GREEN,
-        "default_input_color": YELLOW,
-        "default_riemann_start_color": BLUE,
-        "default_riemann_end_color": GREEN,
-        "area_opacity": 0.8,
-        "num_rects": 50,
-        "include_tip": False,  # add tip at the end of the axes
-        "x_axis_visibility": True,  # show or hide the x axis
-        "y_axis_visibility": True,  # show or hide the y axis
-        "x_label_position": UP + RIGHT,  # where to place the label of the x axis
-        "y_label_position": UP + RIGHT,  # where to place the label of the y axis
-        "x_axis_config": {},
-        "y_axis_config": {},
-    }
+    def __init__(
+        self,
+        x_min=-1,
+        x_max=10,
+        x_axis_width=9,
+        x_leftmost_tick=None,  # Change if different from x_min
+        x_labeled_nums=None,
+        x_axis_label="$x$",
+        y_min=-1,
+        y_max=10,
+        y_axis_height=6,
+        y_bottom_tick=None,  # Change if different from y_min
+        y_labeled_nums=None,
+        y_axis_label="$y$",
+        axes_color=GREY,
+        graph_origin=2.5 * DOWN + 4 * LEFT,
+        exclude_zero_label=True,
+        default_graph_colors=[BLUE, GREEN, YELLOW],
+        default_derivative_color=GREEN,
+        default_input_color=YELLOW,
+        default_riemann_start_color=BLUE,
+        default_riemann_end_color=GREEN,
+        area_opacity=0.8,
+        num_rects=50,
+        include_tip=False,  # add tip at the end of the axes
+        x_axis_visibility=True,  # show or hide the x axis
+        y_axis_visibility=True,  # show or hide the y axis
+        x_label_position=UP + RIGHT,  # where to place the label of the x axis
+        y_label_position=UP + RIGHT,  # where to place the label of the y axis
+        x_axis_config={},
+        y_axis_config={},
+        **kwargs,
+    ):
+        self.x_min = x_min
+        self.x_max = x_max
+        self.x_axis_width = x_axis_width
+        self.x_leftmost_tick = x_leftmost_tick
+        self.x_labeled_nums = x_labeled_nums
+        self.x_axis_label = x_axis_label
+        self.y_min = y_min
+        self.y_max = y_max
+        self.y_axis_height = y_axis_height
+        self.y_bottom_tick = y_bottom_tick
+        self.y_labeled_nums = y_labeled_nums
+        self.y_axis_label = y_axis_label
+        self.axes_color = axes_color
+        self.graph_origin = graph_origin
+        self.exclude_zero_label = exclude_zero_label
+        self.default_graph_colors = default_graph_colors
+        self.default_derivative_color = default_derivative_color
+        self.default_input_color = default_input_color
+        self.default_riemann_start_color = default_riemann_start_color
+        self.default_riemann_end_color = default_riemann_end_color
+        self.area_opacity = area_opacity
+        self.num_rects = num_rects
+        self.include_tip = include_tip
+        self.x_axis_visibility = x_axis_visibility
+        self.y_axis_visibility = y_axis_visibility
+        self.x_label_position = x_label_position
+        self.y_label_position = y_label_position
+        self.x_axis_config = x_axis_config
+        self.y_axis_config = y_axis_config
+        super().__init__(**kwargs)
 
     def setup(self):
         """
@@ -107,7 +184,10 @@ class GraphScene(Scene):
         )
 
         x_axis = NumberLine(**self.x_axis_config)
-        x_axis.shift(self.graph_origin - x_axis.number_to_point(0))
+        x_shift = x_axis.number_to_point(
+            0 if self.x_min <= 0 <= self.x_max else self.x_min
+        )
+        x_axis.shift(self.graph_origin - x_shift)
         if len(self.x_labeled_nums) > 0:
             if self.exclude_zero_label:
                 self.x_labeled_nums = [x for x in self.x_labeled_nums if x != 0]
@@ -115,11 +195,10 @@ class GraphScene(Scene):
         if self.x_axis_label:
             x_label = Tex(self.x_axis_label)
             x_label.next_to(
-                x_axis.get_tips() if self.include_tip else x_axis.get_tick_marks(),
+                x_axis.get_corner(self.x_label_position),
                 self.x_label_position,
                 buff=SMALL_BUFF,
             )
-            x_label.shift_onto_screen()
             x_axis.add(x_label)
             self.x_axis_label_mob = x_label
 
@@ -141,7 +220,6 @@ class GraphScene(Scene):
                 "leftmost_tick": self.y_bottom_tick,
                 "numbers_with_elongated_ticks": self.y_labeled_nums,
                 "color": self.axes_color,
-                "line_to_number_vect": LEFT,
                 "label_direction": LEFT,
                 "include_tip": self.include_tip,
             },
@@ -149,8 +227,11 @@ class GraphScene(Scene):
         )
 
         y_axis = NumberLine(**self.y_axis_config)
-        y_axis.shift(self.graph_origin - y_axis.number_to_point(0))
-        y_axis.rotate(np.pi / 2, about_point=y_axis.number_to_point(0))
+        y_shift = y_axis.number_to_point(
+            0 if self.y_min <= 0 <= self.y_max else self.y_min
+        )
+        y_axis.shift(self.graph_origin - y_shift)
+        y_axis.rotate(np.pi / 2, about_point=self.graph_origin)
         if len(self.y_labeled_nums) > 0:
             if self.exclude_zero_label:
                 self.y_labeled_nums = [y for y in self.y_labeled_nums if y != 0]
@@ -162,7 +243,6 @@ class GraphScene(Scene):
                 self.y_label_position,
                 buff=SMALL_BUFF,
             )
-            y_label.shift_onto_screen()
             y_axis.add(y_label)
             self.y_axis_label_mob = y_label
 
@@ -199,6 +279,29 @@ class GraphScene(Scene):
         -------
         np.ndarray
             The array of the coordinates.
+
+        Examples
+        --------
+
+        .. manim:: SequencePlot
+            :save_last_frame:
+
+            class SequencePlot(GraphScene):
+                def __init__(self, **kwargs):
+                    GraphScene.__init__(
+                        self,
+                        y_axis_label=r"Concentration [\\%]",
+                        x_axis_label="Time [s]",
+                        **kwargs
+                    )
+
+                def construct(self):
+                    data = [1, 2, 2, 4, 4, 1, 3]
+                    self.setup_axes()
+                    for time, dat in enumerate(data):
+                        dot = Dot().move_to(self.coords_to_point(time, dat))
+                        self.add(dot)
+
         """
         assert hasattr(self, "x_axis") and hasattr(self, "y_axis")
         result = self.x_axis.number_to_point(x)[0] * RIGHT
@@ -518,7 +621,7 @@ class GraphScene(Scene):
             elif input_sample_type == "center":
                 sample_input = x + 0.5 * dx
             else:
-                raise Exception("Invalid input sample type")
+                raise ValueError("Invalid input sample type")
             graph_point = self.input_to_graph_point(sample_input, graph)
             if bounded_graph == None:
                 y_point = 0
@@ -787,17 +890,13 @@ class GraphScene(Scene):
         secant_line_length : int, float, optional
             How long the secant line should be.
 
-        Returns:
-        --------
-        VGroup
-            Resulting group is of the form VGroup(
-                dx_line,
-                df_line,
-                dx_label, (if applicable)
-                df_label, (if applicable)
-                secant_line, (if applicable)
-            )
-            with attributes of those names.
+
+        Returns
+        -------
+        :class:`.VGroup`
+            A group containing the elements ``dx_line``, ``df_line``, and
+            if applicable also ``dx_label``, ``df_label``, ``secant_line``.
+
         """
         kwargs = locals()
         kwargs.pop("self")
@@ -859,12 +958,18 @@ class GraphScene(Scene):
     def add_T_label(
         self, x_val, side=RIGHT, label=None, color=WHITE, animated=False, **kwargs
     ):
-        """
+        """Create a triangle marker with a vertical line from the x-axis
+        to ``self.v_graph`` at the given x coordinate ``x_val``.
+
         This method adds to the Scene:
-            -- a Vertical line from the x-axis to the corresponding point on the graph/curve.
-            -- a small vertical Triangle whose top point lies on the base of the vertical line
-            -- a MathTex to be a label for the Line and Triangle, at the bottom of the Triangle.
-        The scene needs to have the graph have the identifier/variable name self.v_graph.
+
+        - a Vertical line from the x-axis to the corresponding point on the graph/curve.
+        - a small vertical Triangle whose top point lies on the base of the vertical line
+        - a MathTex to be a label for the Line and Triangle, at the bottom of
+          the Triangle.
+
+        The scene needs to have the graph have the identifier/variable
+        name ``self.v_graph``.
 
         Parameters
         ----------
@@ -872,7 +977,7 @@ class GraphScene(Scene):
             The x value at which the secant enters, and intersects
             the graph for the first time.
 
-        side np.array(), optional
+        side : np.array(), optional
 
         label : str, optional
             The label to give the vertline and triangle
@@ -1023,7 +1128,7 @@ class GraphScene(Scene):
         NOTE: At least one of target_dx and target_x should be not None.
         """
         if target_dx is None and target_x is None:
-            raise Exception("At least one of target_x and target_dx must not be None")
+            raise ValueError("At least one of target_x and target_dx must not be None")
         if added_anims is None:
             added_anims = []
 
