@@ -18,9 +18,10 @@ jobs:
         run: |
           prnum=$(python -c "import json;print(json.load(open(r'${GITHUB_EVENT_PATH}'))['number'])")
           git init
-          git remote add origin https://github.com/naveen521kk/manim.git
+          git remote add origin https://github.com/ManimCommunity/manim.git
           git fetch origin pull/${prnum}/head:pr-${prnum}
           git checkout pr-${prnum}
+
       - name: Install black
         run: pip install black
 
@@ -33,11 +34,9 @@ jobs:
           $commitEndpoint=$($payload.pull_request._links.commits.href)
           echo "$commitEndpoint"
           $commits = Invoke-WebRequest -Uri "$commitEndpoint" | ConvertFrom-Json
-          $startCommitSha = $commits[0].sha
-          $endCommitSha = $commits[$commits.count - 1].sha
-          bash -c "git diff --name-only HEAD HEAD~$($commits.count)>/d/changes.txt"
-          
-      - name: Format files if not already
+          bash -c "git diff --name-only HEAD~$($commits.count) HEAD>/d/changes.txt"
+
+      - name: Run Black on top of latest commit
         shell: bash
         run: |
           printf "Checking Files"
@@ -58,15 +57,6 @@ jobs:
               black $file
             fi
           done </d/changes.txt
-      
-      - name: Check File and Report the Files Not formatted
-        shell: powershell
-        run: |
-          echo "$(bash -c 'git diff --name-only')"
-          if ( $(bash -c "git diff --name-only") -eq "" -or $(bash -c "git diff --name-only") -eq $null ){
-            echo 'Files Are Formatted '
-          } else {
-            echo 'Files are not Formated.'
 
       - name: Check File and Report the Files Not formatted
         shell: powershell
