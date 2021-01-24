@@ -1,5 +1,5 @@
 import numpy as np
-from .. import config
+from .. import config,logger
 from ..utils.iterables import list_update
 from ..utils.exceptions import EndSceneEarlyException
 from ..scene.scene_file_writer import SceneFileWriter
@@ -132,6 +132,8 @@ class CairoRenderer:
             NumPy array of pixel values of each pixel in screen.
             The shape of the array is height x width x 3
         """
+        #from PIL import Image
+        #Image.fromarray(self.camera.pixel_array).save('random.png')
         return np.array(self.camera.pixel_array)
 
     def add_frame(self, frame, num_frames=1):

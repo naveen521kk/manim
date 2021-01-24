@@ -35,13 +35,16 @@ pygments = "*"
 rich = "^6.0"
 pycairo = "^1.19"
 manimpango = "^0.1.7"
+networkx = "^2.5"
 grpcio =  { version = "1.33.*", optional = true }
 grpcio-tools = { version = "1.33.*", optional = true }
 watchdog = { version = "*", optional = true }
-networkx = "^2.5"
+skia-python = { version = "^87.1", optional = true }
+glfw = { version = "^2.0.0", optional = true }
 
 [tool.poetry.extras]
 js_renderer = ["grpcio","grpcio-tools","watchdog"]
+skia_renderer = ["skia-python","glfw"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"

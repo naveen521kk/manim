@@ -14,7 +14,7 @@ from manim import *
 # for a 1920x1080 video)
 
 
-class OpeningManim(Scene):
+class OpeningManim(SkiaScene):
     def construct(self):
         title = Tex(r"This is some \LaTeX")
         basel = MathTex(r"\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}")
@@ -69,20 +69,29 @@ class OpeningManim(Scene):
         self.wait()
 
 
-class SquareToCircle(Scene):
+class SquareToCircle(SkiaScene):
     def construct(self):
         circle = Circle()
         square = Square()
+        square.set_fill((BLUE,GREEN))
         square.flip(RIGHT)
         square.rotate(-3 * TAU / 8)
-        circle.set_fill(PINK, opacity=0.5)
+        circle.set_fill((PINK,GREEN), opacity=0.5)
 
         self.play(ShowCreation(square))
         self.play(Transform(square, circle))
-        self.play(FadeOut(square))
+        #self.play(FadeOut(square))
+        #a=Line()
+        #self.play(FadeIn(a))
+        self.wait(2)
+        self.clear()
+        b=Text("Hello World")
+        #b.set_fill((BLACK,YELLOW))
+        self.play(FadeIn(b))
+        self.wait(3)
 
 
-class WarpSquare(Scene):
+class WarpSquare(SkiaScene):
     def construct(self):
         square = Square()
         self.play(
@@ -93,7 +102,7 @@ class WarpSquare(Scene):
         self.wait()
 
 
-class WriteStuff(Scene):
+class WriteStuff(SkiaScene):
     def construct(self):
         example_text = Tex("This is a some text", tex_to_color_map={"text": YELLOW})
         example_tex = MathTex(
@@ -108,7 +117,7 @@ class WriteStuff(Scene):
         self.wait()
 
 
-class UpdatersExample(Scene):
+class UpdatersExample(SkiaScene):
     def construct(self):
         decimal = DecimalNumber(
             0,

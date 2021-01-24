@@ -63,6 +63,11 @@ try:
     from .scene.js_scene import *
 except ModuleNotFoundError:
     pass  # optional deps
+try:
+    from .camera.skia_camera import *
+    from .scene.skia_scene import *
+except ModuleNotFoundError:
+    print('NO')
 from .scene.scene import *
 from .scene.sample_space_scene import *
 from .scene.three_d_scene import *

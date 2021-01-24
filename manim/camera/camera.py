@@ -559,6 +559,8 @@ class Camera:
                 (ph / 2) + fc[1] * fdiv(ph, fh),
             )
         )
+        #logger.error(ctx.get_matrix())
+        #raise Exception(ctx.get_matrix())
         self.cache_cairo_context(pixel_array, ctx)
         return ctx
 
