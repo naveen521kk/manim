@@ -44,7 +44,7 @@ class SkiaCamera(Camera):
         """
         # super.__init__(**kwargs)
         super(SkiaCamera, self).__init__(**kwargs)
-        #glfw_context(self.pixel_width,self.pixel_height)
+        glfw_context(self.pixel_width,self.pixel_height)
         
 
     def __del__(self):
@@ -123,10 +123,10 @@ class SkiaCamera(Camera):
         fw = self.frame_width
         fh = self.frame_height
         fc = self.frame_center
-        #context = skia.GrDirectContext.MakeGL()
-        #info = skia.ImageInfo.MakeN32Premul(pw, ph)
-        #surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
-        surface = skia.Surface(pw, ph)
+        context = skia.GrDirectContext.MakeGL()
+        info = skia.ImageInfo.MakeN32Premul(pw, ph)
+        surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
+        #surface = skia.Surface(pw, ph)
         assert surface is not None
         self._skia_surface = surface
         self.matrix = skia.Matrix.I().setAffine([fdiv(pw, fw),
@@ -192,7 +192,7 @@ class SkiaCamera(Camera):
             #self.set_skia_context_path(canvas, vmobject, paint)
             paint3 = skia.Paint()
             self.apply_stroke_for_paint(paint3, vmobject, canvas)
-            self.set_skia_context_path(canvas, vmobject, paints = [paint1,paint3,paint2])
+            self.set_skia_context_path(canvas, vmobject, paints = [paint1,paint2,paint3])
             self.update_array_from_skia()
         return self
 
@@ -227,12 +227,26 @@ class SkiaCamera(Camera):
             if vmobject.consider_points_equals_2d(subpath[0], subpath[-1]):
                 path.close()
                 path_shot = path.snapshot()
+                #rect = skia.Rect(0,0,1,1)
+                #canvas.Translate(rect.Location);
                 #region = skia.Region()
                 #region.setPath(region)
                 for paint in paints:
-                    #canvas.drawPath(path_shot,paint)
-                    canvas.clipPath(path_shot)
-                    canvas.drawPaint(paint)
+                    new = skia.Path()
+                    if paint.getFillPath(path_shot,new):
+                        canvas.drawPath(new,paint)
+                    else:
+                        print("oh no")
+                        canvas.drawPath(path_shot,paint)
+                    
+                #canvas.clipPath(path_shot)
+                #canvas.drawPaint(paints[0])
+                #canvas.drawPaint(paints[1])
+                #canvas.drawPaint(paints[2])
+                #canvas.drawPaint(paints[1])
+                #canvas.save()
+                
+                
                     
 
 
