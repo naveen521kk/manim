@@ -182,7 +182,7 @@ class Camera(object):
 
     def init_context(self, ctx=None):
         if ctx is None:
-            ctx = moderngl.create_standalone_context()
+            ctx = moderngl.create_context(standalone=True, backend='egl')
             fbo = self.get_fbo(ctx, 0)
         else:
             fbo = ctx.detect_framebuffer()
