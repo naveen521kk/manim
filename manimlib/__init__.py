@@ -1,3 +1,4 @@
+import pyglet
 from manimlib.constants import *
 
 from manimlib.animation.animation import *
@@ -15,15 +16,20 @@ from manimlib.animation.transform_matching_parts import *
 from manimlib.animation.update import *
 
 from manimlib.camera.camera import *
-
-from manimlib.window import *
+try:
+  from manimlib.window import *
+except pyglet.canvas.xlib.NoSuchDisplayException:
+  pass
 
 from manimlib.mobject.coordinate_systems import *
 from manimlib.mobject.changing import *
 from manimlib.mobject.frame import *
 from manimlib.mobject.functions import *
 from manimlib.mobject.geometry import *
-from manimlib.mobject.interactive import *
+try:
+  from manimlib.mobject.interactive import *
+except pyglet.canvas.xlib.NoSuchDisplayException:
+  pass
 from manimlib.mobject.matrix import *
 from manimlib.mobject.mobject import *
 from manimlib.mobject.number_line import *
