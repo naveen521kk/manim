@@ -8,8 +8,8 @@
       <link rel="stylesheet" href="../_static/copybutton.css" />
     <link rel="stylesheet" href="../_static/custom.css" />
     <link rel="stylesheet" href="../_static/colors.css" />
-    <link rel="stylesheet" href="../_static/styles/default.css?58099440898d0668e35c6c89">
-    <link rel="stylesheet" href="../_static/pygments.css?58099440898d0668e35c6c89">
+    <link rel="stylesheet" href="../_static/styles/default.css?5d77ada47369c8dd54e4c563">
+    <link rel="stylesheet" href="../_static/pygments.css?5d77ada47369c8dd54e4c563">
     
 <style>
   :root {
@@ -26,7 +26,7 @@
         <script src="../_static/language_data.js" defer></script>
       
         <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script><script src="../_static/scripts/main.js?58099440898d0668e35c6c89"></script></head>
+        <script src="../_static/copybutton.js"></script><script src="../_static/scripts/main.js?5d77ada47369c8dd54e4c563"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -122,16 +122,29 @@
         </label>
         <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Manim runs on Python 3.8.</p>
+<p>Manim runs on Python 3.6 or higher (Python 3.8 is recommended).</p>
 <p>System requirements are：</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://ffmpeg.org/">FFmpeg</a></p></li>
 <li><p><a class="reference external" href="https://www.opengl.org//">OpenGL</a> (included in python package <code class="docutils literal notranslate"><span class="pre">PyOpenGL</span></code>)</p></li>
 <li><p><a class="reference external" href="https://www.latex-project.org">LaTeX</a> (optional, if you want to use LaTeX)</p></li>
-<li><p><a class="reference external" href="https://www.cairographics.org/">cairo</a> (included in python package <code class="docutils literal notranslate"><span class="pre">pycairo</span></code>. optional, if you want to use <code class="docutils literal notranslate"><span class="pre">Text</span></code> in manim)</p></li>
+<li><p><a class="reference external" href="https://pango.org">Pango</a> (only for Linux)</p></li>
 </ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For Linux Users, installing the wheels provided by
+<a class="reference external" href="https://pypi.org/project/manimpango">ManimPango</a> will cause unwanted side effects.
+See <a class="reference external" href="https://github.com/3b1b/manim/issues/1387">https://github.com/3b1b/manim/issues/1387</a> and <a class="reference external" href="https://github.com/3b1b/manim/issues/1391">https://github.com/3b1b/manim/issues/1391</a></p>
+</div>
 <div class="section" id="directly">
 <h2>Directly<a class="headerlink" href="#directly" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install manimgl</span>
+pip install manimgl
+
+<span class="c1"># Try it out</span>
+manimgl
+</pre></div>
+</div>
 <p>If you want to hack on manimlib itself, clone this repository and in
 that directory execute:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install python requirements</span>
