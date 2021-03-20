@@ -18,7 +18,7 @@ classifiers= [
     "Programming Language :: Python :: 3.8",
     "Natural Language :: English",
     ]
-exclude = ["scripts/","logo/","readme-assets/"]
+exclude = ["scripts/","logo/","readme-assets/","tasks.py"]
 packages = [
     { include = "manim" },
 ]
@@ -56,6 +56,10 @@ pylint = "*"
 guzzle_sphinx_theme = "*"
 recommonmark = "*"
 matplotlib = "^3.3.2"
+towncrier = "^19"
+invoke = "^1.5"
+gitpython = "^3"
+pygithub = "^1"
 
 [tool.poetry.dev-dependencies.black]
 version = "^20.8b1"
@@ -74,3 +78,48 @@ markers = "slow: Mark the test as slow. Can be skipped with --skip_slow"
 [build-system]
 requires = ["setuptools","poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.towncrier]
+    single_file = true
+    filename = "docs/source/changelog/{version}-notes.rst"
+    directory = "docs/upcoming_changes/"
+    issue_format = ":pr:`{issue}`"
+    template = "docs/upcoming_changes/template.rst"
+    underlines = "~="
+    all_bullets = false
+
+
+    [[tool.towncrier.type]]
+        directory = "highlight"
+        name = "Highlights"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "deprecation"
+        name = "Deprecations"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "new_feature"
+        name = "New Features"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "improvement"
+        name = "Bugfixes and Enhancements"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "breaking"
+        name = "Breaking Changes"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "docs"
+        name = "Documentation"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "change"
+        name = "Other Changes"
+        showcontent = true

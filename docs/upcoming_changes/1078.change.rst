@@ -1,0 +1,5 @@
+Fix printing version twice
+--------------------------
+
+Fix printing twice of version when ``--version`` is called from
+command line.

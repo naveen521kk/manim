@@ -1,0 +1,7 @@
+Improve documentation for GraphScene
+------------------------------------
+
+The documentation for `coords_to_point()` and `point_to_coords()`
+under ``manim/scene/graph_scene.py`` describes each function as
+doing the opposite of what it actually does, causing confusion.
+Adjusted documentation for `coords_to_point()` and `point_to_coords()`

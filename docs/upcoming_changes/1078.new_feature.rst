@@ -1,0 +1,5 @@
+Cleanup __main__.py - Use Rich Tracebacks
+-----------------------------------------
+
+Cleans ``__main__.py`` and remove stray print statements.
+Use Rich's print tracebacks, which will make traceback beautiful.

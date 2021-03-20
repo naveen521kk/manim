@@ -1,0 +1,6 @@
+Fix shape of torus with non-default ``minor_radius``
+----------------------------------------------------
+
+The Torus class draws a surface with an elliptical cross-section 
+when ``minor_radius`` is different from 1. This PR ensures 
+the cross-section is always a circle.

@@ -1,0 +1,5 @@
+Improve `Axes`: Rotate labels of y-axis
+---------------------------------------
+
+In Axes, the y axis will be rotated 90deg, but the numbers are
+also rotated, but it shouldn't. Fix it.

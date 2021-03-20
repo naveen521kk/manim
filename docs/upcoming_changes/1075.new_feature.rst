@@ -1,0 +1,12 @@
+Add OpenGL Renderer
+-------------------
+
+Adds an `OpenGLRenderer`, `OpenGLCamera`, OpenGL-enabled 
+Mobjects, and adds a ``--use_opengl_renderer`` flag.
+When this flag is passed, you can pass the ``-p`` flag to
+preview animations, the ``-w`` flag to generate video, 
+and the ``-q`` flag to specify render quality.
+If you don't pass either the ``-p`` or the ``-w`` flag, 
+nothing will happen. 
+Scenes rendered with the OpenGL renderer must only use 
+OpenGL-enabled Mobjects only.

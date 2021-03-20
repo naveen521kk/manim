@@ -1,0 +1,7 @@
+Add new svg files to Documentation and Imports
+----------------------------------------------
+
+In updating the SVG library, some newly created files were
+not added to exports or to the documentation.
+This adds `SVGPathMobject`, `VMobjectFromPathstring`, and 
+the style_utils functions to manim's namespace.

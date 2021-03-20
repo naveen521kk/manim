@@ -1,0 +1,25 @@
+Document Mobject Class
+----------------------
+
+Methods for which documentation was added or improved:
+* ``reset_points``
+* ``init_colors``
+* ``generate_points``
+* ``add``
+* ``add_to_back``
+* ``remove``
+* ``copy``
+* ``update``
+* ``get_time_based_updaters``
+* ``has_time_based_updater``
+* ``get_updaters``
+* ``add_updater``
+* ``remove_updater``
+* ``clear_updaters``
+* ``match_updaters``
+* ``suspend_updating``
+* ``resume_updating``
+* ``apply_to_family``
+* ``shift``
+* ``scale``
+* ``add_background_rectangle``

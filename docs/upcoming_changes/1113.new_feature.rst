@@ -1,0 +1,19 @@
+Add interaction to the OpenGL renderer
+--------------------------------------
+
+Adds ``Scene.interact()``, ``Scene.mouse_point`` and keyboard 
+controls to scenes that use the OpenGL renderer. 
+The keyboard controls are as follows:
+scroll => pan vertically
+shift + scroll => pan horizontally
+shift + move mouse => pan according to mouse
+click + drag => rotate
+ctrl + scroll => zoom
+q => end interaction (after calling `Scene.interact()`)
+r => reset camera
+
+``Scene.mouse_point`` is updated with the location of the
+mouse on each frame. It starts at the origin and will stay 
+there until the mouse is moved on to the screen. After the
+mouse is moved off of the screen, it stays at the last mouse 
+location.

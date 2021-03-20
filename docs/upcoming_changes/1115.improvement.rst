@@ -1,0 +1,5 @@
+Fix bugs in OpenGLMobject and Fix ApplyMethod to support OpenGLMobject
+----------------------------------------------------------------------
+
+Fixed undefined variables and converted `Mobject` to `OpenGLMobject`. 
+Also, fixed assert statement in ``ApplyMethod`` function.

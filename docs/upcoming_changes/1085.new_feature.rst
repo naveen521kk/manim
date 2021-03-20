@@ -1,0 +1,6 @@
+Added Angle/RightAngle classes for two intersecting lines
+---------------------------------------------------------
+
+``ArcAngle`` and ``RightAngle`` are added. They both take
+two lines as input. Then one can specify what possible angle
+they want to draw and customize the look.

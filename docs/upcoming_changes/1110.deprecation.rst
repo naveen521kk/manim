@@ -1,0 +1,5 @@
+Deprecated SmallDot
+-------------------
+
+`SmallDot` isn't necessary and a deprecation warning 
+will be raised. This will be removed in Future.

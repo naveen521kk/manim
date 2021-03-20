@@ -1,0 +1,7 @@
+Raise FileNotFoundError when unable to locate the .cfg file
+-----------------------------------------------------------
+
+Manim will now raise a FileNotFoundError when it can't find
+the specified config file via ``--config_file``. Previously 
+it reverted back to the default configuration without 
+notifying the user.

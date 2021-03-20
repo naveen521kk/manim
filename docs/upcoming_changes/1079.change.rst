@@ -1,0 +1,5 @@
+Remove a hardcoded value in test_version.py
+-------------------------------------------
+
+Replaces the hardcoded value ``manim`` with ``__name__`` 
+in ``test_version.py``.

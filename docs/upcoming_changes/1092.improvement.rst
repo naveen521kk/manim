@@ -1,0 +1,8 @@
+Refactored coordinate_systems.py
+--------------------------------
+
+The default behavior of ``Mobject.rotate`` is to rotate about
+the center of `Mobject`. `NumberLine` is symmetric about the
+point at the number 0, which is not the case when
+``|x_min|`` != ``|x_max|``. Ideally, the dot should coincide with
+the point at number 0 on the line.

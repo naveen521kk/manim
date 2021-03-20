@@ -1,0 +1,6 @@
+Fix broken line spacing in Paragraph
+------------------------------------
+
+The line_spacing kwarg was missing when creating Text mobjects,
+this adds it, which cause the line spacing to be not working
+in `Paragraph`.

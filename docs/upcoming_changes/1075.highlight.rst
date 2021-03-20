@@ -1,0 +1,4 @@
+Add OpenGL Renderer
+-------------------
+
+This allows rendering animations using OpenGL.

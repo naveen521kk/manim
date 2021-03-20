@@ -1,0 +1,5 @@
+Remove "one line summary" from pr template
+------------------------------------------
+
+We changed the method to create the changelog from using the
+one line summary. Instead they are automatically generated.
