@@ -14,6 +14,7 @@ jobs:
     env:
       POETRY_VIRTUALENVS_CREATE: false
       DISPLAY: :0
+      PYTHONIOENCODING: utf-8
     strategy:
       fail-fast: false
       matrix:
@@ -142,5 +143,6 @@ jobs:
       - name: Run tests
         shell: msys2 {0}
         run: |
-          export PATH="$PATH:$(cygpath -u '$PWD/ManimCache/LatexWindows/TinyTeX/bin/win32')"
+          export PATH="$PATH:$PWD/ManimCache/LatexWindows/TinyTeX/bin/win32"
+          echo $PATH
           pytest
