@@ -91,6 +91,8 @@ jobs:
             mingw-w64-x86_64-python-pytest
             mingw-w64-x86_64-python-matplotlib
             mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-moderngl
+            mingw-w64-x86_64-mapbox-earcut
       - name: Download system dependencies (Windows)
         if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
         run: |
