@@ -131,9 +131,11 @@ jobs:
         run: |
           where opengl*
       - name: Install manim
-        shell: msys2bash
+        shell: msys2 {0}
         run: |
+          python -m ensurepip
           pip install -U .
 
       - name: Run tests
+        shell: msys2 {0}
         run: pytest
