@@ -135,6 +135,7 @@ jobs:
       - name: Install manim
         run: |
           poetry install -E webgl_renderer
+          pip install moderngl --force --no-binary :all:
 
       - name: Run tests
         run: poetry run pytest
