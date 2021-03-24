@@ -126,7 +126,6 @@ jobs:
           #Remove-Item C:\msys64\mingw64\bin\python.exe -Force
           #$env:Path += ";" + "$($PWD)\ManimCache\FFmpeg\bin"
           $env:Path += ";" + "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32"
-          #$env:Path += ";" + "$($PWD)\ManimCache\Pango\pango"
           #$env:Path = "$env:USERPROFILE\.poetry\bin;$($env:PATH)"
           #$env:PATH = "C:\msys64\mingw64\bin;$($env:PATH)"
           echo "$env:Path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
