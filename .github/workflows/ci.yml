@@ -87,7 +87,11 @@ jobs:
           release: false
           install: >-
             mingw-w64-x86_64-mesa
-
+      - name: Where OpenGL?
+        shell: cmd
+        run: |
+          set PATH=C:\msys64\mingw64\bin;%PATH%
+          where opengl*
       - name: Download system dependencies (Windows)
         if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
         run: |
