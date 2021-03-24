@@ -90,6 +90,7 @@ jobs:
             mingw-w64-x86_64-manim
             mingw-w64-x86_64-python-pytest
             mingw-w64-x86_64-python-matplotlib
+            mingw-w64-x86_64-python-pip
       - name: Download system dependencies (Windows)
         if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
         run: |
@@ -133,8 +134,7 @@ jobs:
       - name: Install manim
         shell: msys2 {0}
         run: |
-          python -m ensurepip
-          pip install -U .
+          python -m pip install -U .
 
       - name: Run tests
         shell: msys2 {0}
