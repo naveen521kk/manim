@@ -131,7 +131,7 @@ jobs:
         run: |
           where opengl*
       - name: Install manim
-        shell: msys2bash.cmd
+        shell: msys2bash
         run: |
           pip install -U .
 
