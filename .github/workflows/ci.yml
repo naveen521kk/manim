@@ -87,11 +87,9 @@ jobs:
           release: false
           install: >-
             mingw-w64-x86_64-mesa
-      - name: Where OpenGL?
-        shell: cmd
-        run: |
-          set PATH=C:\msys64\mingw64\bin;%PATH%
-          where opengl*
+            mingw-w64-x86_64-manim
+            mingw-w64-x86_64-python-pytest
+            mingw-w64-x86_64-python-matplotlib
       - name: Download system dependencies (Windows)
         if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
         run: |
@@ -120,12 +118,12 @@ jobs:
       - name: Add Windows dependecies to path
         if: runner.os == 'Windows'
         run: |
-          Remove-Item C:\msys64\mingw64\bin\python.exe -Force
-          $env:Path += ";" + "$($PWD)\ManimCache\FFmpeg\bin"
+          #Remove-Item C:\msys64\mingw64\bin\python.exe -Force
+          #$env:Path += ";" + "$($PWD)\ManimCache\FFmpeg\bin"
           $env:Path += ";" + "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32"
-          $env:Path += ";" + "$($PWD)\ManimCache\Pango\pango"
-          $env:Path = "$env:USERPROFILE\.poetry\bin;$($env:PATH)"
-          $env:PATH = "C:\msys64\mingw64\bin;$($env:PATH)"
+          #$env:Path += ";" + "$($PWD)\ManimCache\Pango\pango"
+          #$env:Path = "$env:USERPROFILE\.poetry\bin;$($env:PATH)"
+          #$env:PATH = "C:\msys64\mingw64\bin;$($env:PATH)"
           echo "$env:Path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Where OpenGL?
@@ -133,15 +131,9 @@ jobs:
         run: |
           where opengl*
       - name: Install manim
+        shell: msys2bash.cmd
         run: |
-          poetry install -E webgl_renderer
-          pip install moderngl --force --no-binary :all:
+          pip install -U .
 
       - name: Run tests
-        run: poetry run pytest
-
-      - name: Run module doctests
-        run: poetry run pytest --doctest-modules --ignore-glob="*opengl*" manim
-
-      - name: Run doctests in rst files
-        run: cd docs && pip install -r requirements.txt && poetry run make doctest O=-tskip-manim
+        run: pytest
