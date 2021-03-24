@@ -85,6 +85,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           release: false
+          msystem: MINGW64
           install: >-
             mingw-w64-x86_64-mesa
             mingw-w64-x86_64-manim
@@ -140,4 +141,6 @@ jobs:
 
       - name: Run tests
         shell: msys2 {0}
-        run: pytest
+        run: |
+          export PATH="$PATH:$(cygpath -u '$PWD/ManimCache/LatexWindows/TinyTeX/bin/win32')"
+          pytest
