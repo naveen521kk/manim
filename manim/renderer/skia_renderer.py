@@ -2,6 +2,7 @@ import itertools as it
 import typing
 
 import numpy as np
+from numpy.lib.arraysetops import isin
 import skia
 from PIL import Image
 from scipy.spatial.distance import pdist
@@ -20,9 +21,12 @@ from ..utils.hashing import get_hash_from_play_call
 from ..utils.iterables import list_difference_update, list_update
 from ..utils.simple_functions import fdiv
 from ..utils.space_ops import angle_of_vector
+import operator as op
 
 if typing.TYPE_CHECKING:
     from ..scene.scene import Scene
+
+
 class SkiaRenderer:
     """A renderer using Skia.
 
@@ -42,13 +46,13 @@ class SkiaRenderer:
         self.static_image = None
         self.setup_skia()
 
-    def init_scene(self, scene: 'Scene'):
+    def init_scene(self, scene: "Scene"):
         self.file_writer = SceneFileWriter(
             self,
             scene.__class__.__name__,
         )
 
-    def play(self, scene: 'Scene', *args, **kwargs):
+    def play(self, scene: "Scene", *args, **kwargs):
         # Reset skip_animations to the original state.
         # Needed when rendering only some animations, and skipping others.
         self.skip_animations = self._original_skipping_status
@@ -99,7 +103,7 @@ class SkiaRenderer:
 
     def update_frame(
         self,
-        scene: 'Scene',
+        scene: "Scene",
         mobjects: typing.List[Mobject] = None,
         include_submobjects: bool = True,
         ignore_skipping: bool = True,
@@ -132,7 +136,7 @@ class SkiaRenderer:
         self.capture_mobjects(mobjects, **kwargs)
 
     def render(
-        self, scene: 'Scene', time: int, moving_mobjects: typing.List[Mobject]
+        self, scene: "Scene", time: int, moving_mobjects: typing.List[Mobject]
     ) -> None:
         self.update_frame(scene, moving_mobjects)
         self.add_frame(self.get_frame())
@@ -187,7 +191,7 @@ class SkiaRenderer:
         self.get_image().show()
 
     def save_static_frame_data(
-        self, scene: 'Scene', static_mobjects: typing.Iterable[Mobject]
+        self, scene: "Scene", static_mobjects: typing.Iterable[Mobject]
     ) -> np.ndarray:
         """Compute and save the static frame, that will be reused at each frame to avoid to unecesseraly computer
         static mobjects.
@@ -231,7 +235,7 @@ class SkiaRenderer:
         image = skia.Surface.makeImageSnapshot(self._surface)
         return Image.fromarray(image.toarray())
 
-    def scene_finished(self, scene: 'Scene'):
+    def scene_finished(self, scene: "Scene"):
         # If no animations in scene, render an image instead
         if self.num_plays:
             self.file_writer.finish()
@@ -245,7 +249,7 @@ class SkiaRenderer:
             self.update_frame(scene)
             self.file_writer.save_final_image(self.get_image())
 
-    # Main methods with working with skia is from here.s
+    # Main methods with working with skia is from here.
 
     def setup_skia(self):
         """Returns the cairo context for a pixel array after
@@ -269,21 +273,28 @@ class SkiaRenderer:
         fw = self.camera.frame_width
         fh = self.camera.frame_height
         fc = self.camera.frame_center
-        #context = skia.GrDirectContext.MakeGL()
-        #info = skia.ImageInfo.MakeN32Premul(pw, ph)
-        #surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
+        # context = skia.GrDirectContext.MakeGL()
+        # info = skia.ImageInfo.MakeN32Premul(pw, ph)
+        # surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
         surface = skia.Surface(pw, ph)
         assert surface is not None
         self._surface = surface
         self._canvas = surface.getCanvas()
-        self.matrix = skia.Matrix.I().setAffine(
+        
+        self._scale_x = fdiv(pw, fw)
+        self._skew_x = 0
+        self._translate_x = 0
+        self._skew_y = -fdiv(ph, fh)
+        self._scale_y = (pw / 2) - fc[0] * fdiv(pw, fw)
+        self._translate_y = (ph / 2) + fc[1] * fdiv(ph, fh)
+        self._matrix = skia.Matrix.I().setAffine(
             [
-                fdiv(pw, fw),
-                0,
-                0,
-                -fdiv(ph, fh),
-                (pw / 2) - fc[0] * fdiv(pw, fw),
-                (ph / 2) + fc[1] * fdiv(ph, fh),
+                self._scale_x,
+                self._skew_x,
+                self._translate_x,
+                self._skew_y,
+                self._scale_y,
+                self._translate_y,
             ]
         )
         # logger.info(self.matrix.asAffine())
@@ -403,9 +414,9 @@ class SkiaRenderer:
             When mobject is not an instance of a class that can be rendered.
         """
         self.display_funcs = {
-            #VMobject: self.display_multiple_vectorized_mobjects,
-            #PMobject: self.display_multiple_point_cloud_mobjects,
-            AbstractImageMobject: self.display_multiple_image_mobjects,
+            VMobject: self.display_vectorized_mobjects,
+            # PMobject: self.display_point_cloud_mobjects,
+            AbstractImageMobject: self.display_image_mobjects,
             Mobject: lambda batch, pa: batch,  # Do nothing
         }
         # We have to check each type in turn because we are dealing with
@@ -430,9 +441,7 @@ class SkiaRenderer:
             points = np.zeros((1, 3))
         return points
 
-    def points_to_pixel_coords(
-        self, mobject: Mobject, points: np.ndarray
-    ):
+    def points_to_pixel_coords(self, mobject: Mobject, points: np.ndarray):
         points = self.transform_points_pre_display(mobject, points)
         shifted_points = points - self.camera.frame_center
 
@@ -452,68 +461,263 @@ class SkiaRenderer:
         result[:, 1] = shifted_points[:, 1] * height_mult + height_add
         return result.astype("int")
 
-
-    def display_multiple_image_mobjects(self, image_mobjects:typing.List[AbstractImageMobject]):
+    def display_image_mobjects(
+        self,
+        image_mobject: typing.Union[
+            typing.List[AbstractImageMobject], AbstractImageMobject
+        ],
+    ):
         """Displays multiple image mobjects by modifying the passed pixel_array.
         Parameters
         ----------
         image_mobjects : list
             list of ImageMobjects
         """
-        for image_mobject in image_mobjects:
-            self.display_image_mobject(image_mobject)
+        if isinstance(image_mobject, AbstractImageMobject):
+            corner_coords = self.points_to_pixel_coords(image_mobject, image_mobject.points)
+            ul_coords, ur_coords, dl_coords = corner_coords
+            right_vect = ur_coords - ul_coords
+            down_vect = dl_coords - ul_coords
+            center_coords = ul_coords + (right_vect + down_vect) / 2
 
-    def display_image_mobject(self, image_mobject: AbstractImageMobject):
-        """Displays an ImageMobject by changing the pixel_array suitably.
-        Parameters
-        ----------
-        image_mobject : ImageMobject
-            The imageMobject to display
-        """
-        corner_coords = self.points_to_pixel_coords(image_mobject, image_mobject.points)
-        ul_coords, ur_coords, dl_coords = corner_coords
-        right_vect = ur_coords - ul_coords
-        down_vect = dl_coords - ul_coords
-        center_coords = ul_coords + (right_vect + down_vect) / 2
+            sub_image = Image.fromarray(image_mobject.get_pixel_array(), mode="RGBA")
 
-        sub_image = Image.fromarray(image_mobject.get_pixel_array(), mode="RGBA")
-
-        # Reshape
-        pixel_width = max(int(pdist([ul_coords, ur_coords])), 1)
-        pixel_height = max(int(pdist([ul_coords, dl_coords])), 1)
-        sub_image = sub_image.resize(
-            (pixel_width, pixel_height), resample=image_mobject.resampling_algorithm
-        )
-
-        # Rotate
-        angle = angle_of_vector(right_vect)
-        adjusted_angle = -int(360 * angle / TAU)
-        if adjusted_angle != 0:
-            sub_image = sub_image.rotate(
-                adjusted_angle, resample=image_mobject.resampling_algorithm, expand=1
+            # Reshape
+            pixel_width = max(int(pdist([ul_coords, ur_coords])), 1)
+            pixel_height = max(int(pdist([ul_coords, dl_coords])), 1)
+            sub_image = sub_image.resize(
+                (pixel_width, pixel_height), resample=image_mobject.resampling_algorithm
             )
 
-        # TODO, there is no accounting for a shear...
+            # Rotate
+            angle = angle_of_vector(right_vect)
+            adjusted_angle = -int(360 * angle / TAU)
+            if adjusted_angle != 0:
+                sub_image = sub_image.rotate(
+                    adjusted_angle, resample=image_mobject.resampling_algorithm, expand=1
+                )
 
-        # Paste into an image as large as the camera's pixel array
-        full_image = Image.fromarray(
-            np.zeros((self.camera.pixel_height, self.camera.pixel_width)), mode="RGBA"
+            # TODO, there is no accounting for a shear...
+
+            # Paste into an image as large as the camera's pixel array
+            full_image = Image.fromarray(
+                np.zeros((self.camera.pixel_height, self.camera.pixel_width)), mode="RGBA"
+            )
+            new_ul_coords = center_coords - np.array(sub_image.size) / 2
+            new_ul_coords = new_ul_coords.astype(int)
+            full_image.paste(
+                sub_image,
+                box=(
+                    new_ul_coords[0],
+                    new_ul_coords[1],
+                    new_ul_coords[0] + sub_image.size[0],
+                    new_ul_coords[1] + sub_image.size[1],
+                ),
+            )
+            canvas = self._canvas
+            image = skia.Image.fromarray(np.array(full_image))
+            canvas.drawImage(image, 0, 0)
+        else:
+            for sub_image_mobject in image_mobject:
+                self.display_image_mobjects(sub_image_mobject)
+
+    def display_vectorized_mobjects(
+        self,
+        vmobject: typing.Union[typing.List[VMobject], VMobject],
+    ):
+        if isinstance(vmobject, VMobject):
+            batch_file_pairs = it.groupby(vmobject, lambda vm: vm.background_image_file)
+            for file_name, batch in batch_file_pairs:
+                if file_name:
+                    raise NotImplementedError(
+                        "display_multiple_background_colored_vmobjects"
+                    )
+                    # self.display_multiple_background_colored_vmobjects(batch)
+                else:
+                    for each_vmobject in batch:
+                        canvas = self._canvas
+                        paint1 = skia.Paint()
+                        self.apply_stroke_for_paint(
+                            paint1, each_vmobject, canvas, background=True
+                        )
+                        # self.set_skia_context_path(canvas, vmobject, paint)
+                        paint2 = skia.Paint()
+                        paint2.setStyle(skia.Paint.Style.kFill_Style)
+                        self.set_skia_paint_color(
+                            paint2, each_vmobject.get_fill_rgbas(), each_vmobject
+                        )
+                        # self.set_skia_context_path(canvas, vmobject, paint)
+                        paint3 = skia.Paint()
+                        self.apply_stroke_for_paint(paint3, each_vmobject, canvas)
+                        self.set_skia_context_path(
+                            canvas, each_vmobject, paints=[paint1, paint2, paint3]
+                        )
+                        return self
+        else:
+            for sub_vm_object in vmobject:
+                self.display_vectorized_mobjects(sub_vm_object)
+
+    def set_skia_context_path(self, canvas: skia.Canvas, vmobject: VMobject, paints: typing.Sequence[skia.Paint]):
+        #canvas = self.prepare_canvas_for_drawing(canvas)
+        self._canvas.setMatrix(self._matrix)
+        points = self.transform_points_pre_display(vmobject, vmobject.points)
+        if len(points) == 0:
+            return
+        subpaths = vmobject.gen_subpaths_from_points_2d(points)
+        for subpath in subpaths:
+            quads = vmobject.gen_cubic_bezier_tuples_from_points(subpath)
+            path = skia.Path()
+            #path.setFillType(skia.PathFillType.)
+            start = subpath[0]
+            path.moveTo(*start[:2])
+            for p0, p1, p2, p3 in quads:
+                path.cubicTo(*p1[:2],*p2[:2], *p3[:2])
+            if vmobject.consider_points_equals_2d(subpath[0], subpath[-1]):
+                path.close()
+                #path_shot = path.snapshot()
+                #region = skia.Region()
+                #region.setPath(region)
+                for paint in paints:
+                    canvas.drawPath(path,paint)
+                    #canvas.clipPath(path)
+                    #canvas.drawPaint(paint)
+        self._canvas.setMatrix(skia.Matrix.I())
+    def set_skia_paint_color(
+        self, paint: skia.Paint, rgbas: np.ndarray, vmobject: VMobject
+    ):
+        if len(rgbas) == 1:
+            # Use reversed rgb because cairo surface is
+            # encodes it in reverse order
+            color_space = skia.ColorSpace.MakeSRGB()
+            paint.setColor4f(
+                skia.Color4f(tuple([*rgbas[0][2::-1], rgbas[0][3]])), color_space
+            )
+            # paint.setColor(skia.ColorRED)
+        else:
+            points = vmobject.get_gradient_start_and_end_points()
+            points = self.transform_points_pre_display(vmobject, points)
+            two_points = list(it.chain(*[point[:2] for point in points]))
+            step = 1.0 / (len(rgbas) - 1)
+            offsets = list(np.arange(0, 1 + step, step))
+            colours = []
+            for i in rgbas:
+                colours.append(int(skia.Color4f(tuple([*i[2::-1], i[3]]))))
+            pat = skia.GradientShader.MakeLinear(
+                [skia.Point(*two_points[:2]), skia.Point(*two_points[2:])],
+                colours,
+                positions=offsets,
+            )
+            paint.setShader(pat)
+
+    def apply_stroke_for_paint(self, paint: skia.Paint, vmobject: VMobject,canvas: skia.Canvas, background: bool=False):
+        """Applies a stroke to the VMobject in the cairo context.
+        Parameters
+        ----------
+        paint : skia.Paint
+            The cairo context
+        vmobject : VMobject
+            The VMobject
+        background : bool, optional
+            Whether or not to consider the background when applying this
+            stroke width, by default False
+        Returns
+        -------
+        Camera
+            The camera object with the stroke applied.
+        """
+        paint.setStyle(skia.Paint.Style.kStroke_Style)
+        width = vmobject.get_stroke_width(background)
+        if width == 0:
+            return paint
+        self.set_skia_paint_color(
+            paint, vmobject.get_stroke_rgbas(background=background), vmobject
         )
-        new_ul_coords = center_coords - np.array(sub_image.size) / 2
-        new_ul_coords = new_ul_coords.astype(int)
-        full_image.paste(
-            sub_image,
-            box=(
-                new_ul_coords[0],
-                new_ul_coords[1],
-                new_ul_coords[0] + sub_image.size[0],
-                new_ul_coords[1] + sub_image.size[1],
-            ),
+        #paint = skia.Paint(AntiAlias=True)
+        paint.setStrokeWidth(
+            width
+            * self.camera.line_width_multiple
+            *
+            # This ensures lines have constant width
+            # as you zoom in on them.
+            #(self.frame_width / self.frame_width)
+            (self.camera.frame_width / self.camera.frame_width)
         )
-        # Paint on top of existing pixel array
-        canvas = self._canvas        
-        image = skia.Image.fromarray(np.array(full_image))
-        canvas.drawImage(image, 0, 0)
+        #self.set_skia_context_path(canvas, vmobject, paint)
+        #return paint
+
+    # TODO: later
+    # def display_point_cloud_mobjects(
+    #     self,
+    #     pmobject: typing.Union[typing.List[PMobject], PMobject],
+    # ):
+    #     if isinstance(pmobject,PMobject):
+    #         points = pmobject.points
+    #         rgbas = pmobject.rgbas
+    #         thickness = self.adjusted_thickness(pmobject.stroke_width)
+    #         if len(points) == 0:
+    #             return
+    #         pixel_coords = self.points_to_pixel_coords(pmobject, points)
+    #         pixel_coords = self.thickened_coordinates(pixel_coords, thickness)
+    #         rgba_len = pixel_array.shape[2]
+
+    #         rgbas = (self.rgb_max_val * rgbas).astype(self.pixel_array_dtype)
+    #         target_len = len(pixel_coords)
+    #         factor = target_len // len(rgbas)
+    #         rgbas = np.array([rgbas] * factor).reshape((target_len, rgba_len))
+
+    #         on_screen_indices = self.on_screen_pixels(pixel_coords)
+    #         pixel_coords = pixel_coords[on_screen_indices]
+    #         rgbas = rgbas[on_screen_indices]
+
+    #         ph = self.pixel_height
+    #         pw = self.pixel_width
+
+    #         flattener = np.array([1, pw], dtype="int")
+    #         flattener = flattener.reshape((2, 1))
+    #         indices = np.dot(pixel_coords, flattener)[:, 0]
+    #         indices = indices.astype("int")
+
+    #         new_pa = pixel_array.reshape((ph * pw, rgba_len))
+    #         new_pa[indices] = rgbas
+    #         pixel_array[:, :] = new_pa.reshape((ph, pw, rgba_len))
+    #     else:
+    #         for sub_pm_object in pmobject:
+    #             self.display_point_cloud_mobjects(pmobject)
+
+    # def adjusted_thickness(self, thickness: typing.Union[int,float]):
+    #     """
+    #     Parameters
+    #     ----------
+    #         thickness : int, float
+    #     Returns
+    #     -------
+    #     float
+    #     """
+    #     # TODO: This seems...unsystematic
+    #     big_sum = op.add(config["pixel_height"], config["pixel_width"])
+    #     this_sum = op.add(self.pixel_height, self.pixel_width)
+    #     factor = fdiv(big_sum, this_sum)
+    #     return 1 + (thickness - 1) / factor
+
+    # def thickened_coordinates(self, pixel_coords: np.ndarray, thickness: typing.Union[int,float]):
+    #     """Returns thickened coordinates for a passed array of pixel coords and
+    #     a thickness to thicken by.
+    #     Parameters
+    #     ----------
+    #     pixel_coords : np.array
+    #         Pixel coordinates
+    #     thickness : int, float
+    #         Thickness
+    #     Returns
+    #     -------
+    #     np.array
+    #         Array of thickened pixel coords.
+    #     """
+    #     nudges = self.get_thickening_nudges(thickness)
+    #     pixel_coords = np.array([pixel_coords + nudge for nudge in nudges])
+    #     size = pixel_coords.size
+    #     return pixel_coords.reshape((size // 2, 2))
+
 
 class SkiaCamera:
     def __init__(
@@ -522,6 +726,7 @@ class SkiaCamera:
         frame_center: np.ndarray = ORIGIN,
         background: typing.Optional[np.ndarray] = None,
         background_color: typing.Optional[Colors] = None,
+        line_width_multiple: float = 0.01
     ):
         self.use_z_index = True
 
@@ -537,6 +742,7 @@ class SkiaCamera:
             background_color if background_color else config["background_color"]
         )
         self.renderer = renderer
+        self.line_width_multiple = line_width_multiple
 
     def reset(self):
         canvas = self.renderer._canvas

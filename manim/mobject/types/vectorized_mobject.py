@@ -67,7 +67,7 @@ class VMobject(Mobject):
         close_new_points=False,
         pre_function_handle_to_anchor_scale_factor=0.01,
         make_smooth_after_applying_functions=False,
-        background_image_file=None,
+        background_image_file: str =None,
         shade_in_3d=False,
         # This is within a pixel
         # TODO, do we care about accounting for
