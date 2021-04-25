@@ -25,6 +25,7 @@ from ..container import Container
 from ..mobject.mobject import Mobject, _AnimationBuilder
 from ..mobject.opengl_mobject import OpenGLMobject, OpenGLPoint
 from ..renderer.cairo_renderer import CairoRenderer
+from ..renderer.skia_renderer import SkiaRenderer
 from ..utils.exceptions import EndSceneEarlyException, RerunSceneException
 from ..utils.family import extract_mobject_family_members
 from ..utils.family_ops import restructure_list_to_exclude_certain_family_members
@@ -92,7 +93,7 @@ class Scene(Container):
             self.mouse_drag_point = OpenGLPoint()
 
         if renderer is None:
-            self.renderer = CairoRenderer(
+            self.renderer = SkiaRenderer(
                 camera_class=self.camera_class,
                 skip_animations=kwargs.get("skip_animations", False),
             )

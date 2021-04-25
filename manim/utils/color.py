@@ -294,7 +294,7 @@ def color_to_rgb(color):
         raise ValueError("Invalid color type")
 
 
-def color_to_rgba(color, alpha=1):
+def color_to_rgba(color, alpha=1) -> np.ndarray:
     return np.array([*color_to_rgb(color), alpha])
 
 
