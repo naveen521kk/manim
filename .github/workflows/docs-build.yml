@@ -1,0 +1,68 @@
+name: docs-build
+on:
+  push:
+jobs:
+  docs-build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      
+      - name: Install Dependencies
+        run: |
+          pip install .
+          pip install -r docs/requirements.txt
+      - name: Setup Windows cache
+        id: cache-windows
+        if: runner.os == 'Windows'
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}\ManimCache
+          key: ${{ runner.os }}-dependencies-tinytex-scheme-medium-collection-fontsextra
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
+        run: |
+          $tinyTexPackages = $(python -c "import json;print(' '.join(json.load(open('.github/manimdependency.json'))['windows']['tinytex']))") -Split ' '
+          $OriPath = $env:PATH
+          echo "Install Tinytex"
+          Invoke-WebRequest "https://ci.appveyor.com/api/projects/yihui/tinytex/artifacts/TinyTeX.zip?job=image:%20Visual%20Studio%202019" -O "$($env:TMP)\TinyTex.zip"
+          Expand-Archive -LiteralPath "$($env:TMP)\TinyTex.zip" -DestinationPath "$($PWD)\ManimCache\LatexWindows"
+          $env:Path = "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32;$($env:PATH)"
+          tlmgr update --self
+          tlmgr install standalone everysel preview doublestroke ms setspace rsfs relsize ragged2e fundus-calligra microtype wasysym physics dvisvgm jknapltx wasy cm-super babel-english gnu-freefont mathastext cbfonts-fd
+          tlmgr install scheme-medium
+          tlmgr install collection-fontsextra
+          $env:PATH=$OriPath
+          echo "Completed Latex"
+
+      - name: Add Windows dependencies to PATH
+        if: runner.os == 'Windows'
+        run: |
+          Remove-Item C:\msys64\mingw64\bin\python.exe -Force
+          Remove-Item C:\msys64\mingw64\bin\python3.exe -Force
+          $env:Path += ";" + "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32"
+          $env:Path = "$env:USERPROFILE\.poetry\bin;$($env:PATH)"
+          $env:PATH = "C:\msys64\mingw64\bin;$($env:PATH)"
+          echo "$env:Path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Install and cache ffmpeg (all OS)
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        id: setup-ffmpeg
+      - name: Build
+        continue-on-error: true
+        env:
+          PYTHONIOENCODING: 'utf-8'
+        run: |
+          cd docs
+          make html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: ~/AppData/Local/Temp/sphinx-err-*
