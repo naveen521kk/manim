@@ -166,7 +166,6 @@ jobs:
     container: readthedocs/build:7.0
     steps:
       - run: |
-          apt install libpango1.0-dev
-          python3 -m pip install manimpango
+          python3.8 -m pip install https://github.com/ManimCommunity/ManimPango/releases/download/v0.2.6/ManimPango-0.2.6-cp38-cp38-manylinux2014_x86_64.whl
       - run: |
-          python3 -c "import json,manimpango;print(json.dumps(manimpango.list_fonts(),indent=4))"
+          python3.8 -c "import json,manimpango;print(json.dumps(manimpango.list_fonts(),indent=4))"
