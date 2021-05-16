@@ -1,8 +1,6 @@
 name: CI
 on:
   push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
@@ -162,3 +160,12 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
+  test_rtd: # TODO: Check for i386 builds also
+    runs-on: ubuntu-latest
+    name: Test Wheels Using Docker Images
+    container: readthedocs/build:7.0
+    steps:
+      - run: |
+          pip install manimpango
+      - run: |
+          python -c "import json,manimpango;print(json.dumps(manimpango.list_fonts(),indent=4))"
