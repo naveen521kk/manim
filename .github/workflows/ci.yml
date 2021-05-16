@@ -166,6 +166,6 @@ jobs:
     container: readthedocs/build:7.0
     steps:
       - run: |
-          pip install manimpango
+          python3 -m pip install manimpango
       - run: |
-          python -c "import json,manimpango;print(json.dumps(manimpango.list_fonts(),indent=4))"
+          python3 -c "import json,manimpango;print(json.dumps(manimpango.list_fonts(),indent=4))"
