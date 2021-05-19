@@ -30,16 +30,16 @@ body:
           ```
 
           </details>
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     attributes:
       label: Additional media files
       description: >-
         Paste in the files manim produced on rendering the code above.
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     attributes:
@@ -75,8 +75,8 @@ body:
       description: >-
         Paste in the output of `ffmpeg -version`
       render: sh-session
-      validations:
-        required: true
+    validations:
+      required: true
 
 
   - type: textarea
@@ -93,7 +93,6 @@ body:
       label: Additional comments
       description: >-
         Add further context that you think might be relevant for this issue here.
-
 
   - type: checkboxes
     attributes:
