@@ -1,103 +1,12 @@
-name: Manim bug
+name: Bug report
 description: Report a bug or unexpected behavior when running Manim
 labels: bug
 
 body:
   - type: textarea
     attributes:
-      label: Description of bug / unexpected behavior
+      label: Description
       description: >-
-        Add a clear and concise description of the problem you encountered.
+        A clear and concise description of what the bug is.
     validations:
       required: true
-
-  - type: textarea
-    attributes:
-      label: Expected behavior
-      description: >-
-        A clear and concise description of what you expected to happen.
-
-  - type: textarea
-    attributes:
-      label: How to reproduce the issue
-      description: >-
-        Provide a piece of code illustrating the undesired behavior.
-      value: |
-          <details><summary>Code for reproducing the problem</summary>
-
-          ```py
-          Paste your code here.
-          ```
-
-          </details>
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: Additional media files
-      description: >-
-        Paste in the files manim produced on rendering the code above.
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: Terminal output
-      description: >-
-        Provide the output of the steps above, including the commands
-        themselves and manim's output/traceback etc.
-        Add "-v DEBUG" when calling manim to generate more detailed logs
-        
-      render: sh-session
-
-  - type: input
-    attributes:
-      label: OS (with version)
-    validations:
-      required: true
-
-  - type: input
-    attributes:
-      label: Python version
-    validations:
-      required: true
-
-  - type: input
-    attributes:
-      label: Manim version
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: FFmpeg version
-      description: >-
-        Paste in the output of `ffmpeg -version`
-      render: sh-session
-    validations:
-      required: true
-
-
-  - type: textarea
-    attributes:
-      label: System specifications
-      description: >-
-        Paste details about the installed Python modules(`pip freeze`) and how did
-        you install manim. If it is a latex problem paste the details about the
-        installed latex packages `tlmgr list --only-installed`.
-      render: sh-session
-
-  - type: textarea
-    attributes:
-      label: Additional comments
-      description: >-
-        Add further context that you think might be relevant for this issue here.
-
-  - type: checkboxes
-    attributes:
-      label: Code of Conduct
-      options:
-        - label: >-
-            I agree to follow the [The Manim Community's Code of Conduct](https://docs.manim.community/en/stable/conduct.html).
-          required: true
