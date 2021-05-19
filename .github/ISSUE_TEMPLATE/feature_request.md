@@ -1,8 +1,8 @@
 ---
 name: Feature request
 about: Request a new feature for Manim
-title: ""
-labels: new feature
+title: ''
+labels: ''
 assignees: ''
 
 ---

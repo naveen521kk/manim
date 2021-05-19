@@ -1,8 +1,8 @@
 ---
 name: Installation issue
 about: Report issues with the installation process of Manim
-title: ""
-labels: bug, installation
+title: ''
+labels: bug
 assignees: ''
 
 ---

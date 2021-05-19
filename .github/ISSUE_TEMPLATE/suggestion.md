@@ -1,7 +1,7 @@
 ---
 name: Suggestion
 about: Make a suggestion for the enhancement of existing features
-title: ""
+title: ''
 labels: enhancement
 assignees: ''
 
