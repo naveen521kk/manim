@@ -1,0 +1,133 @@
+name: Install Manim Depenencies
+description: "Install Manim Depenencies - Cross Platform"
+runs:
+  using: composite
+  steps:
+    - name: Cache Variables Setup
+      shell: bash
+      id: cache-vars
+      run: |
+        echo "::set-output name=date::$(/bin/date -u "+%m%w%Y")"
+
+    - name: Install and cache ffmpeg (all OS)
+      uses: FedericoCarboni/setup-ffmpeg@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+      id: setup-ffmpeg
+
+    - name: Setup Linux cache
+      id: cache-linux
+      if: runner.os == 'Linux'
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/tinytex-cache
+        key: ${{ runner.os }}-dependencies-tinytex-${{ hashFiles('.github/manimdependency.json') }}-${{ steps.cache-vars.outputs.date }}
+
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux' && steps.cache-linux.outputs.cache-hit != 'true'
+      run: |
+        tinyTexPackages=$(python -c "import json;print(' '.join(json.load(open('.github/manimdependency.json'))['linux']['tinytex']))")
+        IFS=' '
+        read -a ttp <<< "$tinyTexPackages"
+        oriPath=$PATH
+        sudo mkdir -p $PWD/tinytex-cache
+        echo "Install TinyTeX"
+        sudo curl -L -o "/tmp/TinyTeX.tar.gz" "https://ci.appveyor.com/api/projects/yihui/tinytex/artifacts/TinyTeX.tar.gz?job=image:%20Ubuntu"
+        sudo tar zxf "/tmp/TinyTeX.tar.gz" -C "$PWD/tinytex-cache"
+        mv $PWD/tinytex-cache/.TinyTeX/* "$PWD/tinytex-cache"
+        export PATH="$PWD/tinytex-cache/TinyTeX/bin/x86_64-linux:$PATH"
+        sudo tlmgr update --self
+        for i in "${ttp[@]}"; do
+          sudo tlmgr install "$i"
+        done
+        export PATH="$oriPath"
+        echo "Completed TinyTeX"
+
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get -y install libpango1.0-dev xvfb
+        # start xvfb in the background for opengl
+        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Setup macOS cache
+      id: cache-macos
+      if: runner.os == 'macOS'
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/tinytex-cache
+        key: ${{ runner.os }}-dependencies-tinytex-${{ hashFiles('.github/manimdependency.json') }}-${{ steps.cache-vars.outputs.date }}
+
+    - name: Install system dependencies (MacOS)
+      if: runner.os == 'macOS' && steps.cache-macos.outputs.cache-hit != 'true'
+      run: |
+        tinyTexPackages=$(python -c "import json;print(' '.join(json.load(open('.github/manimdependency.json'))['macos']['tinytex']))")
+        IFS=' '
+        read -a ttp <<< "$tinyTexPackages"
+        oriPath=$PATH
+        sudo mkdir -p $PWD/tinytex-cache
+        echo "Install TinyTeX"
+        sudo curl -L -o "/tmp/TinyTeX.tgz" "https://ci.appveyor.com/api/projects/yihui/tinytex/artifacts/TinyTeX.tgz?job=image:%20macOS"
+        sudo tar zxf "/tmp/TinyTeX.tgz" -C "$PWD/tinytex-cache"
+        export PATH="$PWD/tinytex-cache/TinyTeX/bin/universal-darwin:$PATH"
+        sudo tlmgr update --self
+        for i in "${ttp[@]}"; do
+          sudo tlmgr install "$i"
+        done
+        export PATH="$oriPath"
+        echo "Completed TinyTeX"
+
+      - name: Install cairo (MacOS)
+        if: runner.os == 'macOS'
+        run: brew install cairo
+      
+      - name: Add macOS dependencies to PATH
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo "$PWD/tinytex-cache/TinyTeX/bin/universal-darwin" >> $GITHUB_PATH
+
+      # For OpenGL Mesa Windows
+      - name: Setup MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          release: false
+          msystem: MINGW64
+          path-type: inherit
+          install: >-
+            mingw-w64-x86_64-mesa
+
+      - name: Setup Windows cache
+        id: cache-windows
+        if: runner.os == 'Windows'
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}\ManimCache
+          key: ${{ runner.os }}-dependencies-tinytex-${{ hashFiles('.github/manimdependency.json') }}-${{ steps.cache-vars.outputs.date }}
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows' && steps.cache-windows.outputs.cache-hit != 'true'
+        run: |
+          $tinyTexPackages = $(python -c "import json;print(' '.join(json.load(open('.github/manimdependency.json'))['windows']['tinytex']))") -Split ' '
+          $OriPath = $env:PATH
+          echo "Install Tinytex"
+          Invoke-WebRequest "https://ci.appveyor.com/api/projects/yihui/tinytex/artifacts/TinyTeX.zip?job=image:%20Visual%20Studio%202019" -O "$($env:TMP)\TinyTex.zip"
+          Expand-Archive -LiteralPath "$($env:TMP)\TinyTex.zip" -DestinationPath "$($PWD)\ManimCache\LatexWindows"
+          $env:Path = "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32;$($env:PATH)"
+          tlmgr update --self
+          foreach ($c in $tinyTexPackages){
+            $c=$c.Trim()
+            tlmgr install $c
+          }
+          $env:PATH=$OriPath
+          echo "Completed Latex"
+
+      - name: Add Windows dependencies to PATH
+        if: runner.os == 'Windows'
+        run: |
+          Remove-Item C:\msys64\mingw64\bin\python.exe -Force
+          Remove-Item C:\msys64\mingw64\bin\python3.exe -Force
+          $env:Path += ";" + "$($PWD)\ManimCache\LatexWindows\TinyTeX\bin\win32"
+          $env:PATH = "C:\msys64\mingw64\bin;$($env:PATH)"
+          echo "$env:Path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append

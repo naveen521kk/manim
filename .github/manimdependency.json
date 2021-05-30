@@ -38,5 +38,20 @@
             "wasy",
             "cm-super"
         ]
+    },
+    "linux": {
+        "tinytex": [
+            "standalone",
+            "preview",
+            "doublestroke",
+            "relsize",
+            "fundus-calligra",
+            "wasysym",
+            "physics",
+            "dvisvgm",
+            "rsfs",
+            "wasy",
+            "cm-super"
+        ]
     }
 }
