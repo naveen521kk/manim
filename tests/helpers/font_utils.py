@@ -14,9 +14,9 @@ def fc_register_font(font_file_name: str):
     assert font_file.exists(), f"{font_file} doesn't exists "
     with setup_fontconfig():
         first = manimpango.list_fonts()
-        sys.stderr.write(str(first))
         assert manimpango.fc_register_font(str(font_file))
         second = manimpango.list_fonts()
+        sys.stderr.write(str(second))
         assert len(set(second) - set(first))
         sys.stderr.write(str(list(set(second) - set(first))))
         yield list(set(second) - set(first))
