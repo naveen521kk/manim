@@ -11,13 +11,13 @@ from ...helpers.font_utils import fc_register_font
 class SimpleTextTest(Scene):  # e.g. RoundedRectangleTest
     def construct(self):
         with fc_register_font("Barlow-Regular.ttf") as font:
-            text = Text("Hello World", font=font[0])
+            text = Text("Hello World", font='Barlow-Regular')
         self.play(Write(text))
 
 class ItalicSlantTextTest(Scene):  # e.g. RoundedRectangleTest
     def construct(self):
         with fc_register_font("Barlow-Regular.ttf") as font:
-            text = Text("Hello World", font=font[0], slant=ITALIC)
+            text = Text("Hello World", font='Barlow-Regular', slant=ITALIC)
         self.play(Write(text))
 
 @pytest.mark.slow
