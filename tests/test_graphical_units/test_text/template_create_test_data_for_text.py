@@ -1,4 +1,10 @@
+import sys
+from pathlib import Path
+
 from manim import *
+
+sys.path.append(str(Path(__file__).parent.resolve().parent.parent))
+from tests.helpers.font_utils import fc_register_font
 from tests.helpers.graphical_units import set_test_scene
 
 # Note: DO NOT COMMIT THIS FILE. The purpose of this template is to produce control data for graphical_units_data. As
@@ -6,12 +12,14 @@ from tests.helpers.graphical_units import set_test_scene
 # still available for others :)
 # More about graphical unit tests: https://github.com/ManimCommunity/manim/wiki/Testing#graphical-unit-test
 
-class YourClassTest(Scene):  # e.g. RoundedRectangleTest
+class SimpleTextTest(Scene):  # e.g. RoundedRectangleTest
     def construct(self):
-        circle = Circle()
-        self.play(Animation(circle))
+        # Always register a font before using text objects
+        with fc_register_font("Barlow-Regular.ttf") as font:
+            text = Text("Hello World", font=font[0])
+        self.play(Write(text))
 
 
 set_test_scene(
-    YourClassTest, "INSERT_MODULE_NAME"
+    SimpleTextTest, "text_mobject"
 )  # INSERT_MODULE_NAME can be e.g.  "geometry" or "movements"

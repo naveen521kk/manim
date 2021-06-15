@@ -349,8 +349,9 @@ class SceneFileWriter(object):
             else:
                 self.clean_cache()
         elif is_png_format():
-            target_dir, _ = os.path.splitext(self.image_file_path)
-            logger.info("\n%i images ready at %s\n", self.frame_count, target_dir)
+            pass
+            #target_dir, _ = os.path.splitext(self.image_file_path)
+            #logger.info("\n%i images ready at %s\n", self.frame_count, target_dir)
 
     def open_movie_pipe(self, file_path=None):
         """
