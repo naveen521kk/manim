@@ -153,7 +153,7 @@ def parse_style(svg_style: Dict[str, str]) -> Dict:
     :class:`dict`
         Style attributes, but in manim kwargs form, e.g., keys are fill_color, stroke_color
     """
-
+    svg_style = svg_style.copy()
     manim_style = {}
     fill_default_values(svg_style)
 

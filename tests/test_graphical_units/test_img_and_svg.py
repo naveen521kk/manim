@@ -177,6 +177,10 @@ class UKFlagTest(Scene):
         self.add(uk_flag)
         self.wait()
 
+class MultiUseSVGTest(Scene):  # e.g. RoundedRectangleTest
+    def construct(self):
+        svg = SVGMobject(get_test_resource('MultiUse.svg'))
+        self.play(Create(svg))
 
 class SingleUSStateTest(Scene):
     def construct(self):
