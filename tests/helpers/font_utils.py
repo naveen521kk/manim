@@ -17,7 +17,7 @@ def fc_register_font(font_file_name: str):
         assert manimpango.fc_register_font(str(font_file))
         second = manimpango.list_fonts()
         assert len(set(second) - set(first))
-        sys.stderr.write(list(set(second) - set(first)))
+        sys.stderr.write(str(list(set(second) - set(first))))
         yield list(set(second) - set(first))
         manimpango.fc_unregister_font(str(font_file))
 
