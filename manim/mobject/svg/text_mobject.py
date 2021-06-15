@@ -894,14 +894,20 @@ class MarkupText(SVGMobject):
                     "risus a, vehicula odio. Nam urna tortor, aliquam a nibh eu, commodo "
                     "imperdiet arcu. Donec tincidunt commodo enim a tincidunt."
                 )
-                a = MarkupText(ipsum_text, justify=True).scale(0.4)
-                b = MarkupText(ipsum_text, justify=False).scale(0.4)
+                justified = MarkupText(ipsum_text, justify=True).scale(0.4)
+                not_justified = MarkupText(ipsum_text, justify=False).scale(0.4)
                 just_title = Title("Justified")
                 njust_title = Title("Not Justified")
-                self.add(just_title, a)
+                self.add(njust_title, not_justified)
                 self.play(
-                    Transform(a, b),
-                    Transform(just_title, njust_title),
+                    Transform(
+                        not_justified,
+                        justified,
+                    ),
+                    Transform(
+                        njust_title,
+                        just_title,
+                    ),
                     run_time=2,
                 )
                 self.wait(1)
