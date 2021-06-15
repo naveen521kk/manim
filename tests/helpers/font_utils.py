@@ -24,6 +24,7 @@ def fc_register_font(font_file_name: str):
 @contextmanager
 def setup_fontconfig():
     with tempfile.TemporaryDirectory() as tmpdir:
+        orig_environ = os.environ.copy()
         if sys.platform.startswith("win32") and "GCC" not in sys.version:
             default_fontconfig_configuration = dedent(
                 """\
@@ -132,7 +133,6 @@ def setup_fontconfig():
             )
             with open(Path(tmpdir, "fonts.conf"), "w") as f:
                 f.write(default_fontconfig_configuration)
-            orig_environ = os.environ.copy()
             os.environ["FONTCONFIG_PATH"] = str(tmpdir)
         os.environ["PANGOCAIRO_BACKEND"] = "fc"
         yield
