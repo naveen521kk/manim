@@ -249,22 +249,11 @@ class SkiaRenderer(Renderer):
             self.update_frame(scene)
             self.file_writer.save_final_image(self.get_image())
 
+    
+    
     # Main methods with working with skia is from here.
 
     def setup_skia(self):
-        """Returns the cairo context for a pixel array after
-        caching it to self.pixel_array_to_cairo_context
-        If that array has already been cached, it returns the
-        cached version instead.
-        Parameters
-        ----------
-        pixel_array : np.array
-            The Pixel array to get the cairo context of.
-        Returns
-        -------
-        skia.Canvas
-            The skia canvas of the pixel array.
-        """
         if hasattr(self, "_skia_surface"):
             return self._skia_surface
 
@@ -274,13 +263,16 @@ class SkiaRenderer(Renderer):
         fh = self.camera.frame_height
         fc = self.camera.frame_center
 
+        # glcontext is moderngl's deps, so we can depend
+        # on it.
         glcontext.default_backend()(mode="standalone")
 
         context = skia.GrDirectContext.MakeGL()
         info = skia.ImageInfo.MakeN32Premul(pw, ph)
         surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
-        # surface = skia.Surface(pw, ph)
-        assert surface is not None
+
+        assert surface is not None # if something fails it will return None
+
         self._surface = surface
         self._canvas = surface.getCanvas()
 
@@ -300,8 +292,7 @@ class SkiaRenderer(Renderer):
                 self._translate_y,
             ]
         )
-        # logger.info(self.matrix.asAffine())
-        # self._pixel_array = surface.toarray()
+
         return surface
         # canvas = surface.getCanvas()
         # canvas.scale(pw, ph)
@@ -776,6 +767,10 @@ class SkiaCamera:
         canvas = self.renderer._canvas
         color = skia.Color4f(*color_to_rgba(self.background_color))
         canvas.clear(color)
-        if self.background:
+        # checking for self.background isn't right
+        # because if self.background is an numpy
+        # array this will error out. So, check whether it
+        # is None.
+        if self.background is not None:
             image = skia.Image.fromarray(self.background)
             canvas.drawImage(image, 0, 0)
