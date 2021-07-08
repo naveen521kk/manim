@@ -548,6 +548,7 @@ class SkiaRenderer:
                         )
                         # self.set_skia_context_path(canvas, vmobject, paint)
                         paint3 = skia.Paint()
+                        paint3.setAntiAlias(True)
                         self.apply_stroke_for_paint(paint3, each_vmobject, canvas)
                         self.set_skia_context_path(
                             canvas, each_vmobject, paints=[paint1, paint2, paint3]
