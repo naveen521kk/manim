@@ -128,6 +128,17 @@ def render(
             )
             error_console.print_exception()
             sys.exit(1)
+    elif config.renderer == "skia":
+        from manim.renderer.skia_renderer import SkiaRenderer
+
+        for SceneClass in scene_classes_from_file(file):
+            try:
+                renderer = SkiaRenderer()
+                scene = SceneClass(renderer)
+                scene.render()
+            except Exception:
+                error_console.print_exception()
+                sys.exit(1)
     else:
         for SceneClass in scene_classes_from_file(file):
             try:

@@ -457,3 +457,15 @@ class OpenGLRenderer(Renderer):
             # Only scale wrt one axis
             scale = fh / ph
             return fc + scale * np.array([(px - pw / 2), (py - ph / 2), 0])
+
+    def add_frame():
+        pass
+
+    def freeze_current_frame(self, duration: float) -> None:
+        pass
+
+    def get_image(self) -> Image:
+        return self.get_frame()
+    
+    def show_frame(self) -> None:
+        pass

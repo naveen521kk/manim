@@ -81,7 +81,7 @@ render_options = option_group(
     ),
     option(
         "--renderer",
-        type=click.Choice(["cairo", "opengl", "webgl"], case_sensitive=False),
+        type=click.Choice(["cairo", "opengl", "webgl", "skia"], case_sensitive=False),
         help="Select a renderer for your Scene.",
     ),
     option(

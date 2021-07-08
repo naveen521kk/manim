@@ -2,6 +2,7 @@ import time
 import typing
 
 import numpy as np
+from PIL import Image
 
 from manim.utils.hashing import get_hash_from_play_call
 
@@ -279,3 +280,6 @@ class CairoRenderer(Renderer):
         if config["save_last_frame"]:
             self.update_frame(scene)
             self.file_writer.save_final_image(self.camera.get_image())
+
+    def get_image(self) -> Image:
+        return self.camera.get_image()

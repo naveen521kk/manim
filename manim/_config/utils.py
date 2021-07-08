@@ -1114,7 +1114,7 @@ class ManimConfig(MutableMapping):
 
     @property
     def renderer(self):
-        """Renderer: "cairo", "opengl", "webgl"""
+        """Renderer: "cairo", "opengl", "webgl", "skia"""
         return self._d["renderer"]
 
     @renderer.setter
@@ -1123,7 +1123,7 @@ class ManimConfig(MutableMapping):
         self._set_from_list(
             "renderer",
             val,
-            ["cairo", "opengl", "webgl"],
+            ["cairo", "opengl", "webgl", "skia"],
         )
 
     @property
