@@ -1,11 +1,13 @@
 import itertools as it
 import operator as op
+import typing
 from functools import reduce, wraps
 from typing import Optional
 
 import moderngl
 import numpy as np
 
+from ... import config
 from ...constants import *
 from ...mobject.opengl_mobject import OpenGLMobject, OpenGLPoint
 
@@ -28,6 +30,7 @@ from ...utils.space_ops import (
     cross2d,
     earclip_triangulation,
     get_unit_normal,
+    shoelace_direction,
     z_to_vector,
 )
 
@@ -115,6 +118,7 @@ class OpenGLVMobject(OpenGLMobject):
 
         self.needs_new_triangulation = True
         self.triangulation = np.zeros(0, dtype="i4")
+        self.orientation = 1
         super().__init__(**kwargs)
         self.refresh_unit_normal()
 
@@ -513,6 +517,19 @@ class OpenGLVMobject(OpenGLMobject):
         return np.linalg.norm(p1 - p0) < self.tolerance_for_point_equality
 
     # Information about the curve
+    def force_direction(self, target_direction):
+        if target_direction not in ("CW", "CCW"):
+            raise ValueError('Invalid input for force_direction. Use "CW" or "CCW"')
+
+        if self.get_direction() != target_direction:
+            self.reverse_points()
+
+        return self
+
+    def reverse_direction(self):
+        self.set_points(self.get_points()[::-1])
+        return self
+
     def get_bezier_tuples_from_points(self, points):
         nppc = self.n_points_per_curve
         remainder = len(points) % nppc
@@ -761,6 +778,9 @@ class OpenGLVMobject(OpenGLMobject):
             ]
         )
 
+    def get_direction(self):
+        return shoelace_direction(self.get_start_anchors())
+
     def get_unit_normal(self, recompute=False):
         if not recompute:
             return self.data["unit_normal"][0]
@@ -870,11 +890,14 @@ class OpenGLVMobject(OpenGLMobject):
 
     def interpolate(self, mobject1, mobject2, alpha, *args, **kwargs):
         super().interpolate(mobject1, mobject2, alpha, *args, **kwargs)
-        if self.has_fill():
-            tri1 = mobject1.get_triangulation()
-            tri2 = mobject2.get_triangulation()
-            if len(tri1) != len(tri1) or not np.all(tri1 == tri2):
-                self.refresh_triangulation()
+        if config["use_projection_fill_shaders"]:
+            self.refresh_triangulation()
+        else:
+            if self.has_fill():
+                tri1 = mobject1.get_triangulation()
+                tri2 = mobject2.get_triangulation()
+                if len(tri1) != len(tri1) or not np.all(tri1 == tri2):
+                    self.refresh_triangulation()
         return self
 
     def pointwise_become_partial(self, vmobject, a, b):
@@ -1090,9 +1113,9 @@ class OpenGLVMobject(OpenGLMobject):
         stroke_shader_wrappers = []
         back_stroke_shader_wrappers = []
         for submob in self.family_members_with_points():
-            if submob.has_fill():
+            if submob.has_fill() and not config["use_projection_fill_shaders"]:
                 fill_shader_wrappers.append(submob.get_fill_shader_wrapper())
-            if submob.has_stroke():
+            if submob.has_stroke() and not config["use_projection_stroke_shaders"]:
                 ssw = submob.get_stroke_shader_wrapper()
                 if submob.draw_stroke_behind_fill:
                     back_stroke_shader_wrappers.append(ssw)

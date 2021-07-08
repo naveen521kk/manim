@@ -57,13 +57,12 @@ r"""Animate the display or removal of a mobject from a scene.
 
 
 __all__ = [
-    "ShowPartial",
-    "ShowCreation",
     "Create",
     "Uncreate",
     "DrawBorderThenFill",
     "Write",
     "Unwrite",
+    "ShowPartial",
     "ShowIncreasingSubsets",
     "AddTextLetterByLetter",
     "ShowSubmobjectsOneByOne",
@@ -72,12 +71,20 @@ __all__ = [
 
 
 import itertools as it
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 from colour import Color
-
-from .. import logger
 
 if TYPE_CHECKING:
     from manim.mobject.svg.text_mobject import Text
@@ -88,6 +95,7 @@ from ..mobject.mobject import Group, Mobject
 from ..mobject.types.opengl_vectorized_mobject import OpenGLVMobject
 from ..mobject.types.vectorized_mobject import VMobject
 from ..utils.bezier import integer_interpolate
+from ..utils.deprecation import deprecated
 from ..utils.rate_functions import double_smooth, linear, smooth
 
 
@@ -154,19 +162,6 @@ class Create(ShowPartial):
         lag_ratio: float = 1.0,
         **kwargs,
     ) -> None:
-        super().__init__(mobject, lag_ratio=lag_ratio, **kwargs)
-
-    def _get_bounds(self, alpha: float) -> Tuple[int, float]:
-        return (0, alpha)
-
-
-class ShowCreation(Create):
-    """Deprecated. Use :class:`~.Create` instead."""
-
-    def __init__(self, mobject: VMobject, lag_ratio: float = 1.0, **kwargs) -> None:
-        logger.warning(
-            "ShowCreation has been deprecated in favor of Create. Please use Create instead!"
-        )
         super().__init__(mobject, lag_ratio=lag_ratio, **kwargs)
 
     def _get_bounds(self, alpha: float) -> Tuple[int, float]:
@@ -253,7 +248,7 @@ class DrawBorderThenFill(Animation):
             return vmobject.get_stroke_color()
         return vmobject.get_color()
 
-    def get_all_mobjects(self) -> List[Union[Mobject, None]]:
+    def get_all_mobjects(self) -> Sequence[Mobject]:
         return [*super().get_all_mobjects(), self.outline]
 
     def interpolate_submobject(
@@ -279,12 +274,19 @@ class Write(DrawBorderThenFill):
         class ShowWrite(Scene):
             def construct(self):
                 self.play(Write(Text("Hello").scale(3)))
+
+    .. manim:: ShowWriteReversed
+
+        class ShowWriteReversed(Scene):
+            def construct(self):
+                self.play(Write(Text("Hello").scale(3), reverse=True))
     """
 
     def __init__(
         self,
         vmobject: Union[VMobject, OpenGLVMobject],
         rate_func: Callable[[float], float] = linear,
+        reverse: bool = False,
         **kwargs,
     ) -> None:
         run_time: Optional[float] = kwargs.pop("run_time", None)
@@ -292,6 +294,7 @@ class Write(DrawBorderThenFill):
         run_time, lag_ratio = self._set_default_config_from_length(
             vmobject, run_time, lag_ratio
         )
+        self.reverse = reverse
         super().__init__(
             vmobject,
             rate_func=rate_func,
@@ -316,6 +319,19 @@ class Write(DrawBorderThenFill):
             lag_ratio = min(4.0 / length, 0.2)
         return run_time, lag_ratio
 
+    def reverse_submobjects(self) -> None:
+        self.mobject.invert(recursive=True)
+
+    def begin(self) -> None:
+        if self.reverse:
+            self.reverse_submobjects()
+        super().begin()
+
+    def finish(self) -> None:
+        if self.reverse:
+            self.reverse_submobjects()
+        super().finish()
+
 
 class Unwrite(Write):
     """Simulate erasing by hand a :class:`~.Text` or a :class:`~.VMobject`.
@@ -328,34 +344,31 @@ class Unwrite(Write):
     Examples
     --------
 
-    .. manim:: UnwriteReverseFalse
-
-        class UnwriteReverseFalse(Scene):
-            def construct(self):
-                text = Tex("Alice and Bob").scale(3)
-                self.add(text)
-                self.play(Unwrite(text))
-
     .. manim :: UnwriteReverseTrue
 
         class UnwriteReverseTrue(Scene):
             def construct(self):
                 text = Tex("Alice and Bob").scale(3)
                 self.add(text)
-                self.play(Unwrite(text,reverse=True))
+                self.play(Unwrite(text))
 
+    .. manim:: UnwriteReverseFalse
+
+        class UnwriteReverseFalse(Scene):
+            def construct(self):
+                text = Tex("Alice and Bob").scale(3)
+                self.add(text)
+                self.play(Unwrite(text, reverse=False))
     """
 
     def __init__(
         self,
         vmobject: VMobject,
         rate_func: Callable[[float], float] = linear,
-        reverse: bool = False,
+        reverse: bool = True,
         **kwargs,
     ) -> None:
 
-        self.vmobject = vmobject
-        self.reverse = reverse
         run_time: Optional[float] = kwargs.pop("run_time", None)
         lag_ratio: Optional[float] = kwargs.pop("lag_ratio", None)
         run_time, lag_ratio = self._set_default_config_from_length(
@@ -366,21 +379,9 @@ class Unwrite(Write):
             run_time=run_time,
             lag_ratio=lag_ratio,
             rate_func=lambda t: -rate_func(t) + 1,
+            reverse=reverse,
             **kwargs,
         )
-
-    def begin(self) -> None:
-        if not self.reverse:
-            self.reverse_submobjects()
-        super().begin()
-
-    def finish(self) -> None:
-        if not self.reverse:
-            self.reverse_submobjects()
-        super().finish()
-
-    def reverse_submobjects(self) -> None:
-        self.vmobject.invert(recursive=True)
 
 
 class ShowIncreasingSubsets(Animation):

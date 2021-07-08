@@ -49,6 +49,12 @@ class CircleTest(Scene):
         self.add(circle)
 
 
+class CirclePointsTest(Scene):
+    def construct(self):
+        circle = Circle.from_three_points(LEFT, LEFT + UP, UP * 2)
+        self.add(circle)
+
+
 class DotTest(Scene):
     def construct(self):
         dot = Dot()
@@ -163,6 +169,28 @@ class RightAngleTest(Scene):
         l2 = Line(ORIGIN, UP)
         a = RightAngle(l1, l2)
         self.add(a)
+
+
+class PolygramTest(Scene):
+    def construct(self):
+        hexagram = Polygram(
+            [[0, 2, 0], [-np.sqrt(3), -1, 0], [np.sqrt(3), -1, 0]],
+            [[-np.sqrt(3), 1, 0], [0, -2, 0], [np.sqrt(3), 1, 0]],
+        )
+        self.add(hexagram)
+
+
+class RegularPolygramTest(Scene):
+    def construct(self):
+        pentagram = RegularPolygram(5, radius=2)
+        octagram = RegularPolygram(8, radius=2)
+        self.add(VGroup(pentagram, octagram).arrange(RIGHT))
+
+
+class StarTest(Scene):
+    def construct(self):
+        star = Star(outer_radius=2)
+        self.add(star)
 
 
 MODULE_NAME = "geometry"

@@ -9,6 +9,7 @@ from ..mobject.types.opengl_vectorized_mobject import (
     OpenGLVMobject,
 )
 from ..utils.color import *
+from ..utils.deprecation import deprecated
 from ..utils.iterables import adjacent_n_tuples, adjacent_pairs
 from ..utils.simple_functions import clip, fdiv
 from ..utils.space_ops import (
@@ -201,7 +202,6 @@ class OpenGLArc(OpenGLTipableVMobject):
         angle=TAU / 4,
         radius=1.0,
         n_components=8,
-        anchors_span_full_range=True,
         arc_center=ORIGIN,
         **kwargs
     ):
@@ -209,9 +209,9 @@ class OpenGLArc(OpenGLTipableVMobject):
         self.angle = angle
         self.radius = radius
         self.n_components = n_components
-        self.anchors_span_full_range = anchors_span_full_range
         self.arc_center = arc_center
-        OpenGLVMobject.__init__(self, **kwargs)
+        super().__init__(self, **kwargs)
+        self.orientation = -1
 
     def init_points(self):
         self.set_points(
@@ -221,6 +221,7 @@ class OpenGLArc(OpenGLTipableVMobject):
                 n_components=self.n_components,
             )
         )
+        # To maintain proper orientation for fill shaders.
         self.scale(self.radius, about_point=ORIGIN)
         self.shift(self.arc_center)
 
@@ -294,18 +295,8 @@ class OpenGLCurvedDoubleArrow(OpenGLCurvedArrow):
 
 
 class OpenGLCircle(OpenGLArc):
-    def __init__(
-        self, color=RED, close_new_points=True, anchors_span_full_range=False, **kwargs
-    ):
-        OpenGLArc.__init__(
-            self,
-            0,
-            TAU,
-            color=color,
-            close_new_points=close_new_points,
-            anchors_span_full_range=anchors_span_full_range,
-            **kwargs
-        )
+    def __init__(self, color=RED, **kwargs):
+        OpenGLArc.__init__(self, 0, TAU, color=color, **kwargs)
 
     def surround(self, mobject, dim_to_match=0, stretch=False, buff=MED_SMALL_BUFF):
         # Ignores dim_to_match and stretch; result will always be a circle
@@ -338,17 +329,6 @@ class OpenGLDot(OpenGLCircle):
             color=color,
             **kwargs
         )
-
-
-class OpenGLSmallDot(OpenGLDot):
-    """ Deprecated"""
-
-    def __init__(self, radius=DEFAULT_SMALL_DOT_RADIUS, **kwargs):
-        logger.warning(
-            "OpenGLSmallDot has been deprecated and will be removed in a future release."
-            "Use OpenGLDot instead."
-        )
-        super().__init__(radius=radius, **kwargs)
 
 
 class OpenGLEllipse(OpenGLCircle):
@@ -546,15 +526,9 @@ class OpenGLLine(OpenGLTipableVMobject):
 
 class OpenGLDashedLine(OpenGLLine):
     def __init__(
-        self,
-        *args,
-        dash_length=DEFAULT_DASH_LENGTH,
-        dash_spacing=None,
-        positive_space_ratio=0.5,
-        **kwargs
+        self, *args, dash_length=DEFAULT_DASH_LENGTH, positive_space_ratio=0.5, **kwargs
     ):
         self.dash_length = dash_length
-        self.dash_spacing = (dash_spacing,)
         self.positive_space_ratio = positive_space_ratio
         super().__init__(*args, **kwargs)
         ps_ratio = self.positive_space_ratio
@@ -872,17 +846,7 @@ class OpenGLArrowTip(OpenGLTriangle):
 
 
 class OpenGLRectangle(OpenGLPolygon):
-    def __init__(
-        self,
-        color=WHITE,
-        width=4.0,
-        height=2.0,
-        mark_paths_closed=True,
-        close_new_points=True,
-        **kwargs
-    ):
-        self.mark_paths_closed = mark_paths_closed
-        self.close_new_points = close_new_points
+    def __init__(self, color=WHITE, width=4.0, height=2.0, **kwargs):
         OpenGLPolygon.__init__(self, UR, UL, DL, DR, color=color, **kwargs)
 
         self.set_width(width, stretch=True)

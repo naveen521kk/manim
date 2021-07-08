@@ -163,24 +163,24 @@ __all__ = [
     "OpenGLTex",
     "OpenGLBulletedList",
     "OpenGLTitle",
-    "OpenGLTexMobject",
-    "OpenGLTextMobject",
 ]
 
 
 import operator as op
 from functools import reduce
 
-from ... import config, logger
+from ... import config
 from ...constants import *
 from ...mobject.opengl_geometry import OpenGLLine
 from ...mobject.svg.opengl_svg_mobject import OpenGLSVGMobject
 from ...mobject.svg.opengl_svg_path import OpenGLSVGPathMobject
+from ...mobject.svg.tex_mobject import MathTex, Tex
 from ...mobject.types.opengl_vectorized_mobject import (
     OpenGLVectorizedPoint,
     OpenGLVGroup,
 )
 from ...utils.color import BLACK
+from ...utils.deprecation import deprecated
 from ...utils.strings import split_string_list_to_isolate_substrings
 from ...utils.tex_file_writing import tex_to_svg_file
 from .style_utils import parse_style
@@ -251,6 +251,8 @@ class OpenGLSingleStringMathTex(OpenGLSVGMobject):
             self.scale(TEX_MOB_SCALE_FACTOR)
         if self.organize_left_to_right:
             self.organize_submobjects_left_to_right()
+        for mob in self.submobjects:
+            mob.orientation = -1
 
     def __repr__(self):
         return f"{type(self).__name__}({repr(self.tex_string)})"
@@ -595,21 +597,3 @@ class OpenGLTitle(OpenGLTex):
                 underline.width = underline_width
             self.add(underline)
             self.underline = underline
-
-
-class OpenGLTexMobject(OpenGLMathTex):
-    def __init__(self, *tex_strings, **kwargs):
-        logger.warning(
-            "TexMobject has been deprecated (due to its confusing name) "
-            "in favour of MathTex. Please use MathTex instead!"
-        )
-        MathTex.__init__(self, *tex_strings, **kwargs)
-
-
-class OpenGLTextMobject(OpenGLTex):
-    def __init__(self, *text_parts, **kwargs):
-        logger.warning(
-            "TextMobject has been deprecated (due to its confusing name) "
-            "in favour of Tex. Please use Tex instead!"
-        )
-        Tex.__init__(self, *text_parts, **kwargs)
