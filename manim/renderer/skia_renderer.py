@@ -1,8 +1,8 @@
 import itertools as it
 import typing
 
+import glcontext
 import numpy as np
-from numpy.lib.arraysetops import isin
 import skia
 from PIL import Image
 from scipy.spatial.distance import pdist
@@ -21,13 +21,13 @@ from ..utils.hashing import get_hash_from_play_call
 from ..utils.iterables import list_difference_update, list_update
 from ..utils.simple_functions import fdiv
 from ..utils.space_ops import angle_of_vector
-import operator as op
+from . import Renderer
 
 if typing.TYPE_CHECKING:
     from ..scene.scene import Scene
 
 
-class SkiaRenderer:
+class SkiaRenderer(Renderer):
     """A renderer using Skia.
 
     num_plays : Number of play() functions in the scene.
@@ -273,14 +273,17 @@ class SkiaRenderer:
         fw = self.camera.frame_width
         fh = self.camera.frame_height
         fc = self.camera.frame_center
-        # context = skia.GrDirectContext.MakeGL()
-        # info = skia.ImageInfo.MakeN32Premul(pw, ph)
-        # surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
-        surface = skia.Surface(pw, ph)
+
+        glcontext.default_backend()(mode="standalone")
+
+        context = skia.GrDirectContext.MakeGL()
+        info = skia.ImageInfo.MakeN32Premul(pw, ph)
+        surface = skia.Surface.MakeRenderTarget(context, skia.Budgeted.kNo, info)
+        # surface = skia.Surface(pw, ph)
         assert surface is not None
         self._surface = surface
         self._canvas = surface.getCanvas()
-        
+
         self._scale_x = fdiv(pw, fw)
         self._skew_x = 0
         self._translate_x = 0
@@ -474,7 +477,9 @@ class SkiaRenderer:
             list of ImageMobjects
         """
         if isinstance(image_mobject, AbstractImageMobject):
-            corner_coords = self.points_to_pixel_coords(image_mobject, image_mobject.points)
+            corner_coords = self.points_to_pixel_coords(
+                image_mobject, image_mobject.points
+            )
             ul_coords, ur_coords, dl_coords = corner_coords
             right_vect = ur_coords - ul_coords
             down_vect = dl_coords - ul_coords
@@ -494,14 +499,17 @@ class SkiaRenderer:
             adjusted_angle = -int(360 * angle / TAU)
             if adjusted_angle != 0:
                 sub_image = sub_image.rotate(
-                    adjusted_angle, resample=image_mobject.resampling_algorithm, expand=1
+                    adjusted_angle,
+                    resample=image_mobject.resampling_algorithm,
+                    expand=1,
                 )
 
             # TODO, there is no accounting for a shear...
 
             # Paste into an image as large as the camera's pixel array
             full_image = Image.fromarray(
-                np.zeros((self.camera.pixel_height, self.camera.pixel_width)), mode="RGBA"
+                np.zeros((self.camera.pixel_height, self.camera.pixel_width)),
+                mode="RGBA",
             )
             new_ul_coords = center_coords - np.array(sub_image.size) / 2
             new_ul_coords = new_ul_coords.astype(int)
@@ -526,9 +534,9 @@ class SkiaRenderer:
         vmobject: typing.Union[typing.List[VMobject], VMobject],
     ):
         if isinstance(vmobject, VMobject):
-            batch_file_pairs = it.groupby(vmobject, lambda vm: vm.background_image_file)
-            for file_name, batch in batch_file_pairs:
-                if file_name:
+            batch_image_pairs  = it.groupby(vmobject, lambda vm: vm.get_background_image())
+            for image, batch in batch_image_pairs:
+                if image:
                     raise NotImplementedError(
                         "display_multiple_background_colored_vmobjects"
                     )
@@ -536,12 +544,14 @@ class SkiaRenderer:
                 else:
                     for each_vmobject in batch:
                         canvas = self._canvas
-                        paint1 = skia.Paint()
-                        self.apply_stroke_for_paint(
-                            paint1, each_vmobject, canvas, background=True
-                        )
+                        # paint1 = skia.Paint()
+                        # #paint1.setAntiAlias(True)
+                        # self.apply_stroke_for_paint(
+                        #     paint1, each_vmobject, canvas, background=True
+                        # )
                         # self.set_skia_context_path(canvas, vmobject, paint)
                         paint2 = skia.Paint()
+                        # paint2.setAntiAlias(True)
                         paint2.setStyle(skia.Paint.Style.kFill_Style)
                         self.set_skia_paint_color(
                             paint2, each_vmobject.get_fill_rgbas(), each_vmobject
@@ -551,15 +561,25 @@ class SkiaRenderer:
                         paint3.setAntiAlias(True)
                         self.apply_stroke_for_paint(paint3, each_vmobject, canvas)
                         self.set_skia_context_path(
-                            canvas, each_vmobject, paints=[paint1, paint2, paint3]
+                            canvas,
+                            each_vmobject,
+                            paints=[
+                                paint2,
+                                paint3,
+                            ],
                         )
                         return self
         else:
             for sub_vm_object in vmobject:
                 self.display_vectorized_mobjects(sub_vm_object)
 
-    def set_skia_context_path(self, canvas: skia.Canvas, vmobject: VMobject, paints: typing.Sequence[skia.Paint]):
-        #canvas = self.prepare_canvas_for_drawing(canvas)
+    def set_skia_context_path(
+        self,
+        canvas: skia.Canvas,
+        vmobject: VMobject,
+        paints: typing.Sequence[skia.Paint],
+    ):
+        # canvas = self.prepare_canvas_for_drawing(canvas)
         self._canvas.setMatrix(self._matrix)
         points = self.transform_points_pre_display(vmobject, vmobject.points)
         if len(points) == 0:
@@ -568,21 +588,22 @@ class SkiaRenderer:
         for subpath in subpaths:
             quads = vmobject.gen_cubic_bezier_tuples_from_points(subpath)
             path = skia.Path()
-            #path.setFillType(skia.PathFillType.)
+            # path.setFillType(skia.PathFillType.)
             start = subpath[0]
             path.moveTo(*start[:2])
             for p0, p1, p2, p3 in quads:
-                path.cubicTo(*p1[:2],*p2[:2], *p3[:2])
+                path.cubicTo(*p1[:2], *p2[:2], *p3[:2])
             if vmobject.consider_points_equals_2d(subpath[0], subpath[-1]):
                 path.close()
-                #path_shot = path.snapshot()
-                #region = skia.Region()
-                #region.setPath(region)
+                # path_shot = path.snapshot()
+                # region = skia.Region()
+                # region.setPath(region)
                 for paint in paints:
-                    canvas.drawPath(path,paint)
-                    #canvas.clipPath(path)
-                    #canvas.drawPaint(paint)
+                    canvas.drawPath(path, paint)
+                    # canvas.clipPath(path)
+                    # canvas.drawPaint(paint)
         self._canvas.setMatrix(skia.Matrix.I())
+
     def set_skia_paint_color(
         self, paint: skia.Paint, rgbas: np.ndarray, vmobject: VMobject
     ):
@@ -610,7 +631,13 @@ class SkiaRenderer:
             )
             paint.setShader(pat)
 
-    def apply_stroke_for_paint(self, paint: skia.Paint, vmobject: VMobject,canvas: skia.Canvas, background: bool=False):
+    def apply_stroke_for_paint(
+        self,
+        paint: skia.Paint,
+        vmobject: VMobject,
+        canvas: skia.Canvas,
+        background: bool = False,
+    ):
         """Applies a stroke to the VMobject in the cairo context.
         Parameters
         ----------
@@ -633,18 +660,18 @@ class SkiaRenderer:
         self.set_skia_paint_color(
             paint, vmobject.get_stroke_rgbas(background=background), vmobject
         )
-        #paint = skia.Paint(AntiAlias=True)
+        # paint = skia.Paint(AntiAlias=True)
         paint.setStrokeWidth(
             width
             * self.camera.line_width_multiple
             *
             # This ensures lines have constant width
             # as you zoom in on them.
-            #(self.frame_width / self.frame_width)
+            # (self.frame_width / self.frame_width)
             (self.camera.frame_width / self.camera.frame_width)
         )
-        #self.set_skia_context_path(canvas, vmobject, paint)
-        #return paint
+        # self.set_skia_context_path(canvas, vmobject, paint)
+        return paint
 
     # TODO: later
     # def display_point_cloud_mobjects(
@@ -727,7 +754,7 @@ class SkiaCamera:
         frame_center: np.ndarray = ORIGIN,
         background: typing.Optional[np.ndarray] = None,
         background_color: typing.Optional[Colors] = None,
-        line_width_multiple: float = 0.01
+        line_width_multiple: float = 0.01,
     ):
         self.use_z_index = True
 

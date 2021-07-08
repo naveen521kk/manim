@@ -3,9 +3,9 @@ import copy
 from manim import config
 
 from ..utils.family import extract_mobject_family_members
+from . import Renderer
 
-
-class WebGLRenderer:
+class WebGLRenderer(Renderer):
     def __init__(self, frame_server):
         self.skip_animations = True
         self.frame_server = frame_server

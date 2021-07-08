@@ -12,6 +12,7 @@ from manim.utils.caching import handle_caching_play
 from manim.utils.color import color_to_rgb, color_to_rgba
 from manim.utils.exceptions import EndSceneEarlyException
 
+from . import Renderer
 from ..constants import *
 from ..mobject.opengl_mobject import OpenGLMobject, OpenGLPoint
 from ..mobject.types.opengl_vectorized_mobject import OpenGLVMobject
@@ -202,7 +203,7 @@ JOINT_TYPE_MAP = {
 }
 
 
-class OpenGLRenderer:
+class OpenGLRenderer(Renderer):
     def __init__(self, skip_animations=False):
         # Measured in pixel widths, used for vector graphics
         self.anti_alias_width = 1.5

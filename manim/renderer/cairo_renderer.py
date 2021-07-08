@@ -11,6 +11,7 @@ from ..mobject.mobject import Mobject
 from ..scene.scene_file_writer import SceneFileWriter
 from ..utils.exceptions import EndSceneEarlyException
 from ..utils.iterables import list_update
+from . import Renderer
 
 
 def handle_play_like_call(func):
@@ -50,7 +51,7 @@ def handle_play_like_call(func):
     return wrapper
 
 
-class CairoRenderer:
+class CairoRenderer(Renderer):
     """A renderer using Cairo.
 
     num_plays : Number of play() functions in the scene.
