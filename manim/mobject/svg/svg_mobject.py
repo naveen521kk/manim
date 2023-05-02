@@ -20,6 +20,7 @@ from ..geometry.line import Line
 from ..geometry.polygram import Polygon, Rectangle, RoundedRectangle
 from ..opengl.opengl_compatibility import ConvertToOpenGL
 from ..types.vectorized_mobject import VMobject
+from ..geometry.boolean_ops import Intersection
 
 __all__ = ["SVGMobject", "VMobjectFromSVGPath"]
 
@@ -195,8 +196,13 @@ class SVGMobject(VMobject, metaclass=ConvertToOpenGL):
         # Create a temporary svg file to dump modified svg to be parsed
         modified_file_path = file_path.with_name(f"{file_path.stem}_{file_path.suffix}")
         new_tree.write(modified_file_path)
-
-        svg = se.SVG.parse(modified_file_path)
+        svg = se.SVG.parse(
+            file_path,
+            width=config.pixel_width,
+            height=config.pixel_height,
+        )
+        print('viewbox', svg.width, svg.height, config.pixel_width,
+            config.pixel_height, svg.viewbox, svg.viewbox_transform,)
         modified_file_path.unlink()
 
         mobjects = self.get_mobjects_from(svg)
@@ -267,7 +273,9 @@ class SVGMobject(VMobject, metaclass=ConvertToOpenGL):
             if isinstance(shape, se.Group):
                 continue
             elif isinstance(shape, se.Path):
-                mob = self.path_to_mobject(shape)
+                mob = self.path_to_mobject(shape, svg)
+                print(se.Matrix(svg.viewbox_transform))
+                self.handle_transform(mob, se.Matrix(svg.viewbox_transform))
             elif isinstance(shape, se.SimpleLine):
                 mob = self.line_to_mobject(shape)
             elif isinstance(shape, se.Rect):
@@ -331,7 +339,7 @@ class SVGMobject(VMobject, metaclass=ConvertToOpenGL):
         )
         return mob
 
-    def path_to_mobject(self, path: se.Path) -> VMobjectFromSVGPath:
+    def path_to_mobject(self, path: se.Path, svg: se.SVG) -> VMobjectFromSVGPath:
         """Convert a path element to a vectorized mobject.
 
         Parameters
@@ -339,7 +347,7 @@ class SVGMobject(VMobject, metaclass=ConvertToOpenGL):
         path
             The parsed SVG path.
         """
-        return VMobjectFromSVGPath(path, **self.path_string_config)
+        return VMobjectFromSVGPath(path, svg, **self.path_string_config)
 
     @staticmethod
     def line_to_mobject(line: se.Line) -> Line:
@@ -476,6 +484,7 @@ class VMobjectFromSVGPath(VMobject, metaclass=ConvertToOpenGL):
     def __init__(
         self,
         path_obj: se.Path,
+        svg: se.SVG,
         long_lines: bool = False,
         should_subdivide_sharp_curves: bool = False,
         should_remove_null_curves: bool = False,
@@ -488,13 +497,23 @@ class VMobjectFromSVGPath(VMobject, metaclass=ConvertToOpenGL):
         self.long_lines = long_lines
         self.should_subdivide_sharp_curves = should_subdivide_sharp_curves
         self.should_remove_null_curves = should_remove_null_curves
+        if svg:
+            self.viewbox_rec = Rectangle(
+                width=svg.width,
+                height=svg.height,
+            ).move_to([0, 0, 0])
+        else:
+            self.viewbox_rec = Rectangle(
+                width=config.frame_width,
+                height=config.frame_height,
+            )
 
         super().__init__(**kwargs)
 
     def init_points(self) -> None:
         # TODO: cache mobject in a re-importable way
-
         self.handle_commands()
+        print(self.get_midpoint())
 
         if config.renderer == "opengl":
             if self.should_subdivide_sharp_curves:
@@ -566,6 +585,7 @@ class VMobjectFromSVGPath(VMobject, metaclass=ConvertToOpenGL):
                 move_pen(end)
 
         for segment in self.path_obj:
+            print(segment, segment.__class__)
             segment_class = segment.__class__
             if segment_class == se.Move:
                 move_pen(_convert_point_to_3d(*segment.end))
@@ -595,6 +615,7 @@ class VMobjectFromSVGPath(VMobject, metaclass=ConvertToOpenGL):
                 raise AssertionError(f"Not implemented: {segment_class}")
 
         self.points = np.array(all_points, ndmin=2, dtype="float64")
+        self.points = Intersection(self.viewbox_rec, self).points
         # If we have no points, make sure the array is shaped properly
         # (0 rows tall by 3 columns wide) so future operations can
         # add or remove points correctly.

@@ -10,4 +10,6 @@ Modules
     ~numbers
     ~tex_mobject
     ~text_mobject
+    ~old_text_mobject
+    ~formatted_strings
 """
